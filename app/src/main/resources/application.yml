@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: RevoiceChat
+revoicechat:
+  global:
+    sever-mode: MONO_SERVER
