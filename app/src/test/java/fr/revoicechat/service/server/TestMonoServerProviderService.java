@@ -21,9 +21,10 @@ import fr.revoicechat.repository.ServerRepository;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class TestMonoServerProviderService {
+class  {
 
   @Mock private ServerRepository serverRepository;
+  @Mock private NewServerCreator newServerCreator;
   @InjectMocks private MonoServerProviderService serverProviderService;
 
   @BeforeEach
@@ -43,13 +44,11 @@ class TestMonoServerProviderService {
 
   @Test
   void testGetServerWithNoResult() {
+    doReturn(new Server()).when(newServerCreator).create(any(Server.class));
     doReturn(List.of()).when(serverRepository).findAll();
     var result = serverProviderService.getServers();
     assertThat(result).hasSize(1);
-    var server = result.getFirst();
-    assertThat(server.getId()).isNotNull();
-    assertThat(server.getName()).isEqualTo("server");
-    verify(serverRepository).save(server);
+    verify(newServerCreator).create(any());
   }
 
   @Test
