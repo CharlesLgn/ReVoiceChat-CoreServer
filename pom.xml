@@ -45,7 +45,7 @@
 			<scope>test</scope>
 		</dependency>
 
-<!--		TODO - CVE - à voir pour utilisé open API dirrectement -->
+<!--		TODO - CVE - see to use open API directly -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>

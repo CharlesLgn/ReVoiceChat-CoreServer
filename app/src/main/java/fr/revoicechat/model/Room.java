@@ -52,11 +52,11 @@ public class Room implements Serializable {
   public boolean equals(final Object o) {
     if (this == o) { return true; }
     if (!(o instanceof Room room)) { return false; }
-    return Objects.equals(id, room.id);
+    return Objects.equals(getId(), room.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id);
+    return Objects.hashCode(getId());
   }
 }

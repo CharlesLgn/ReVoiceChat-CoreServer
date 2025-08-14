@@ -12,7 +12,7 @@ import fr.revoicechat.service.server.ServerProviderService;
 @Configuration
 public class RevoiceChatBeans {
 
-  private ApplicationContext applicationContext;
+  private final ApplicationContext applicationContext;
 
   public RevoiceChatBeans(final ApplicationContext applicationContext) {
     this.applicationContext = applicationContext;

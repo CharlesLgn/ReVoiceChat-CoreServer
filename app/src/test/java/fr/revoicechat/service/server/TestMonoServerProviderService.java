@@ -30,30 +30,40 @@ class TestMonoServerProviderService {
   @BeforeEach
   void setUp() {
     doAnswer(invocationOnMock -> invocationOnMock.getArgument(0))
-        .when(serverRepository).save(any(Server.class));
+        .when(newServerCreator).create(any(Server.class));
   }
 
   @Test
   void testGetServerWithOneResult() {
+    // Given
     Server server = new Server();
     doReturn(List.of(server)).when(serverRepository).findAll();
+    // When
     var result = serverProviderService.getServers();
+    // Then
     assertThat(result).hasSize(1);
     assertThat(result.getFirst()).isSameAs(server);
   }
 
   @Test
   void testGetServerWithNoResult() {
-    doReturn(new Server()).when(newServerCreator).create(any(Server.class));
+    // Given
     doReturn(List.of()).when(serverRepository).findAll();
+    // When
     var result = serverProviderService.getServers();
+    // Then
     assertThat(result).hasSize(1);
+    var server = result.getFirst();
+    assertThat(server).isNotNull();
+    assertThat(server.getName()).isEqualTo("server");
     verify(newServerCreator).create(any());
   }
 
   @Test
   void testGetServerWithTwoResults() {
+    // Given
     doReturn(List.of(new Server(), new Server())).when(serverRepository).findAll();
+    // When - Then
     assertThatThrownBy(serverProviderService::getServers)
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("Yous current application cant be run in mono server because you have more thant one existing server");
@@ -62,14 +72,18 @@ class TestMonoServerProviderService {
   @ParameterizedTest
   @ValueSource(longs = {0, 1})
   void testCanBeUsed(long numberOfServer) {
+    // Given
     doReturn(numberOfServer).when(serverRepository).count();
+    // When - Then
     assertThatCode(serverProviderService::canBeUsed).doesNotThrowAnyException();
   }
 
   @ParameterizedTest
   @ValueSource(longs = {2, 3, 4, 5, 6, 7, 8, 9})
   void testCanBeUsedError(long numberOfServer) {
+    // Given
     doReturn(numberOfServer).when(serverRepository).count();
+    // When - Then
     assertThatThrownBy(serverProviderService::canBeUsed)
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("Yous current application cant be run in mono server because you have more thant one existing server");

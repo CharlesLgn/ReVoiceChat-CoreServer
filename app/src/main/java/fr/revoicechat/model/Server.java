@@ -52,11 +52,11 @@ public class Server implements Serializable {
   public boolean equals(final Object o) {
     if (this == o) { return true; }
     if (!(o instanceof Server server)) { return false; }
-    return Objects.equals(id, server.id);
+    return Objects.equals(getId(), server.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id);
+    return Objects.hashCode(getId());
   }
 }

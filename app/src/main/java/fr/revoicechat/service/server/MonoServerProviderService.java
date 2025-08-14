@@ -11,7 +11,10 @@ import fr.revoicechat.repository.ServerRepository;
 import jakarta.transaction.Transactional;
 
 /**
- *
+ * {@link ServerProviderService} implementation for single-server mode.
+ * <p>
+ * In this mode, only one {@link Server} may exist in the system.
+ * If no server is found, a new one is automatically created.
  */
 @Service
 public class MonoServerProviderService implements ServerProviderService {
@@ -24,7 +27,13 @@ public class MonoServerProviderService implements ServerProviderService {
     this.newServerCreator = newServerCreator;
   }
 
-  /** This can only be used if we have only one {@link Server} */
+  /**
+   * Ensures that the application is in a valid single-server state.
+   * <p>
+   * This method throws an exception if more than one server exists.
+   *
+   * @throws IllegalStateException if more than one server exists
+   */
   @Override
   public void canBeUsed() {
     if (serverRepository.count() > 1) {
@@ -34,6 +43,14 @@ public class MonoServerProviderService implements ServerProviderService {
     LOG.info("Mono server mode : can be used");
   }
 
+  /**
+   * Returns the single server available in the system, creating one if none exists.
+   * <p>
+   * Throws an exception if more than one server is present.
+   *
+   * @return a list containing the single server
+   * @throws IllegalStateException if more than one server exists
+   */
   @Override
   @Transactional
   public List<Server> getServers() {
@@ -43,8 +60,9 @@ public class MonoServerProviderService implements ServerProviderService {
     } else if (servers.size() == 1) {
       return servers;
     }
-    Server server = newServerCreator.create(new Server());
-    return List.of(server);
+    var server = new Server();
+    server.setName("server");
+    return List.of(newServerCreator.create(server));
   }
 
   private static void throwEx() {

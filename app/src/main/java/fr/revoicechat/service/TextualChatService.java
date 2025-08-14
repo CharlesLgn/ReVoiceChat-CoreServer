@@ -20,6 +20,19 @@ import fr.revoicechat.repository.MessageRepository;
 import fr.revoicechat.repository.RoomRepository;
 import jakarta.transaction.Transactional;
 
+/**
+ * Service that manages textual chat messages and real-time updates via Server-Sent Events (SSE).
+ * <p>
+ * This service allows clients to:
+ * <ul>
+ *     <li>Retrieve all messages for a given chat room</li>
+ *     <li>Register for real-time message updates using SSE</li>
+ *     <li>Send messages to a room and broadcast them to connected clients</li>
+ * </ul>
+ * <p>
+ * SSE emitters are stored in-memory per room and removed automatically when a connection
+ * completes, times out, or encounters an error.
+ */
 @Service
 public class TextualChatService {
   private static final Logger LOG = LoggerFactory.getLogger(TextualChatService.class);
@@ -34,10 +47,25 @@ public class TextualChatService {
     this.roomRepository = roomRepository;
   }
 
+  /**
+   * Retrieves all messages for a given chat room.
+   *
+   * @param roomId the unique identifier of the chat room
+   * @return list of messages in the room, possibly empty if no messages exist
+   */
   public List<Message> findAllMessage(final UUID roomId) {
     return messageRepository.findByRoomId(roomId);
   }
 
+  /**
+   * Registers a new client connection to receive real-time updates for a given room.
+   * <p>
+   * The returned {@link SseEmitter} will remain open indefinitely until the client disconnects
+   * or an error/timeout occurs. When any of these events happen, the emitter is removed from the registry.
+   *
+   * @param roomId the unique identifier of the chat room
+   * @return the SSE emitter for streaming messages to the client
+   */
   public SseEmitter register(final UUID roomId) {
     SseEmitter emitter = new SseEmitter(0L);
     emitter.onCompletion(() -> remove(roomId, emitter, () -> LOG.info("complete")));
@@ -47,6 +75,15 @@ public class TextualChatService {
     return emitter;
   }
 
+  /**
+   * Sends a new message to all connected clients in a chat room and stores it in the database.
+   * <p>
+   * If the room does not exist, an exception is thrown.
+   *
+   * @param roomId  the unique identifier of the chat room
+   * @param message the message to send and persist
+   * @throws java.util.NoSuchElementException if the room does not exist
+   */
   @Transactional
   public void send(final UUID roomId, Message message) {
     var room = roomRepository.findById(roomId).orElseThrow();

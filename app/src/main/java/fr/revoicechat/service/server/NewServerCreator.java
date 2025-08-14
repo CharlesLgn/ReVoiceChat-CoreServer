@@ -22,17 +22,16 @@ public class NewServerCreator {
 
   public Server create(Server server) {
     server.setId(UUID.randomUUID());
-    server.setName("server");
     serverRepository.save(server);
     createRoom(server, "General");
     createRoom(server, "Random");
     return server;
   }
 
-  private void createRoom(final Server server, final String general) {
+  private void createRoom(final Server server, final String name) {
     Room room = new Room();
     room.setId(UUID.randomUUID());
-    room.setName(general);
+    room.setName(name);
     room.setServer(server);
     roomRepository.save(room);
   }

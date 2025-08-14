@@ -62,11 +62,11 @@ public class Message implements Serializable {
   public boolean equals(final Object o) {
     if (this == o) { return true; }
     if (!(o instanceof Message message)) { return false; }
-    return Objects.equals(id, message.id);
+    return Objects.equals(getId(), message.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id);
+    return Objects.hashCode(getId());
   }
 }
