@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 class TestServer {
 
   @Test
+  @SuppressWarnings({"java:S5838", "java:S5863"})
   void test() {
     var id1 = UUID.randomUUID();
     var server1 = new Server();

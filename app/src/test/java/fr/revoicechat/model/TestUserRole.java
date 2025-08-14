@@ -11,6 +11,7 @@ import fr.revoicechat.model.UserRole.UserRolePK;
 class TestUserRole {
 
   @Test
+  @SuppressWarnings({"java:S5838", "java:S5863"})
   void test() {
     var id1 = UUID.randomUUID();
     var user1 = user(id1);
