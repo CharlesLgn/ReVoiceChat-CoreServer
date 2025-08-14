@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mini Voice Chat (Self Monitor)</title>
+</head>
+<body>
+<h2>Mini Voice Chat</h2>
+<button id="startBtn">Start Call</button>
+<audio id="remoteAudio" autoplay></audio>
+
+<script>
+    const socket = new WebSocket("ws://localhost:8080/signal");
+    const pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+    });
+
+    const remoteAudio = document.getElementById("remoteAudio");
+
+    // Handle remote audio from other peer
+    pc.ontrack = event => {
+        remoteAudio.srcObject = event.streams[0];
+    };
+
+    // Send ICE candidates to peer
+    pc.onicecandidate = event => {
+        if (event.candidate) {
+            socket.send(JSON.stringify({ candidate: event.candidate }));
+        }
+    };
+
+    // Handle signaling messages
+    socket.onmessage = async (msg) => {
+        const data = JSON.parse(msg.data);
+
+        if (data.offer) {
+            await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Add mic to peer connection
+            stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+            // --- Self-monitoring audio ---
+            const localAudio = document.createElement("audio");
+            localAudio.autoplay = true;
+            localAudio.muted = false; // allow hearing yourself
+            localAudio.srcObject = stream;
+            document.body.appendChild(localAudio); // optional
+
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            socket.send(JSON.stringify({ answer: answer }));
+        }
+
+        if (data.answer) {
+            await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+        }
+
+        if (data.candidate) {
+            try {
+                await pc.addIceCandidate(data.candidate);
+            } catch (e) {
+                console.error("Error adding ICE candidate", e);
+            }
+        }
+    };
+
+    // Start call (send offer)
+    document.getElementById("startBtn").onclick = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+        // --- Self-monitoring audio ---
+        const localAudio = document.createElement("audio");
+        localAudio.autoplay = true;
+        localAudio.muted = false; // allow hearing yourself
+        localAudio.srcObject = stream;
+        document.body.appendChild(localAudio); // optional
+
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        socket.send(JSON.stringify({ offer: offer }));
+    };
+</script>
+</body>
+</html>
