@@ -1,5 +1,7 @@
 package fr.revoicechat.web;
 
+import java.io.IOError;
+import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,10 +13,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import fr.revoicechat.service.server.ServerProviderService;
-
-public class SignalingHandler extends TextWebSocketHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(SignalingHandler.class);
+public class VoiceSignalingHandler extends TextWebSocketHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(VoiceSignalingHandler.class);
   private final Set<WebSocketSession> sessions = ConcurrentHashMap.newKeySet();
 
   @Override
@@ -25,12 +25,18 @@ public class SignalingHandler extends TextWebSocketHandler {
 
   @Override
   protected void handleTextMessage(@NonNull WebSocketSession session, @NonNull TextMessage message) throws Exception {
-    LOG.info("handleTextMessage: {}", message);
-    for (WebSocketSession s : sessions) {
-      if (s.isOpen()) {// && !s.equals(session)) {
-        s.sendMessage(message);
-      }
-    }
+    LOG.debug("handleTextMessage: {}", message);
+    sessions.stream()
+            .filter(WebSocketSession::isOpen)
+            // TODO - commented for test purpose. you cannot normally ear yourself
+            // .filter(not(session::equals))
+            .forEach(s -> {
+              try {
+                s.sendMessage(message);
+              } catch (IOException e) {
+                throw new IOError(e);
+              }
+            });
   }
 
   @Override
