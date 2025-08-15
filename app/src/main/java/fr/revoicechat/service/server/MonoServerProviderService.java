@@ -20,6 +20,10 @@ import jakarta.transaction.Transactional;
 public class MonoServerProviderService implements ServerProviderService {
   private static final Logger LOG = LoggerFactory.getLogger(MonoServerProviderService.class);
 
+  static final String ERROR_MESSAGE = """
+        Your current application can't be run in mono server \
+        because you have more than one existing server""";
+
   private final ServerRepository serverRepository;
   private final NewServerCreator newServerCreator;
 
@@ -38,7 +42,7 @@ public class MonoServerProviderService implements ServerProviderService {
   public void canBeUsed() {
     if (serverRepository.count() > 1) {
       LOG.error("Mono server mode : error");
-      throwEx();
+      throw new IllegalStateException(ERROR_MESSAGE);
     }
     LOG.info("Mono server mode : available");
   }
@@ -56,7 +60,7 @@ public class MonoServerProviderService implements ServerProviderService {
   public List<Server> getServers() {
     var servers = serverRepository.findAll();
     if (servers.size() > 1) {
-      throwEx();
+      throw new IllegalStateException(ERROR_MESSAGE);
     } else if (servers.size() == 1) {
       return servers;
     }
@@ -65,9 +69,4 @@ public class MonoServerProviderService implements ServerProviderService {
     return List.of(newServerCreator.create(server));
   }
 
-  private static void throwEx() {
-    throw new IllegalStateException("""
-        Yous current application can't be run in mono server \
-        because you have more than one existing server""");
-  }
 }

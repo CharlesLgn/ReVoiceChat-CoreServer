@@ -1,5 +1,6 @@
 package fr.revoicechat.service.server;
 
+import static fr.revoicechat.service.server.MonoServerProviderService.ERROR_MESSAGE;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -66,7 +67,7 @@ class TestMonoServerProviderService {
     // When - Then
     assertThatThrownBy(serverProviderService::getServers)
         .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Yous current application cant be run in mono server because you have more thant one existing server");
+        .hasMessage(ERROR_MESSAGE);
   }
 
   @ParameterizedTest
@@ -86,6 +87,6 @@ class TestMonoServerProviderService {
     // When - Then
     assertThatThrownBy(serverProviderService::canBeUsed)
         .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Yous current application cant be run in mono server because you have more thant one existing server");
+        .hasMessage(ERROR_MESSAGE);
   }
 }
