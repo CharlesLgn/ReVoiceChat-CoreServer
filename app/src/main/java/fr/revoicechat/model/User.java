@@ -21,7 +21,10 @@ public class User implements Serializable {
   private UUID id;
   @Column(unique = true)
   private String email;
+  @Column(unique = true, nullable = false)
   private String login;
+  @Column(nullable = false)
+  private String username;
   private String password;
   private LocalDateTime createdDate;
   @ManyToMany
@@ -56,6 +59,14 @@ public class User implements Serializable {
 
   public void setLogin(final String login) {
     this.login = login;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(final String username) {
+    this.username = username;
   }
 
   public String getPassword() {

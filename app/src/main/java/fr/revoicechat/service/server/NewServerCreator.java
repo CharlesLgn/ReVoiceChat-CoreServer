@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import fr.revoicechat.model.Room;
+import fr.revoicechat.model.RoomType;
 import fr.revoicechat.model.Server;
 import fr.revoicechat.repository.RoomRepository;
 import fr.revoicechat.repository.ServerRepository;
@@ -23,16 +24,18 @@ public class NewServerCreator {
   public Server create(Server server) {
     server.setId(UUID.randomUUID());
     serverRepository.save(server);
-    createRoom(server, "General");
-    createRoom(server, "Random");
+    createRoom(server, "General",  RoomType.TEXT);
+    createRoom(server, "Random",   RoomType.TEXT);
+    createRoom(server, "🔊 Vocal", RoomType.WEBRTC);
     return server;
   }
 
-  private void createRoom(final Server server, final String name) {
+  private void createRoom(final Server server, final String name, RoomType type) {
     Room room = new Room();
     room.setId(UUID.randomUUID());
     room.setName(name);
     room.setServer(server);
+    room.setType(type);
     roomRepository.save(room);
   }
 }

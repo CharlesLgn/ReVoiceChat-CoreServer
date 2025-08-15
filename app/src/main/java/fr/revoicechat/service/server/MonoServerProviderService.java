@@ -40,7 +40,7 @@ public class MonoServerProviderService implements ServerProviderService {
       LOG.error("Mono server mode : error");
       throwEx();
     }
-    LOG.info("Mono server mode : can be used");
+    LOG.info("Mono server mode : available");
   }
 
   /**
@@ -61,13 +61,13 @@ public class MonoServerProviderService implements ServerProviderService {
       return servers;
     }
     var server = new Server();
-    server.setName("server");
+    server.setName("Server");
     return List.of(newServerCreator.create(server));
   }
 
   private static void throwEx() {
     throw new IllegalStateException("""
-        Yous current application cant be run in mono server \
-        because you have more thant one existing server""");
+        Yous current application can't be run in mono server \
+        because you have more than one existing server""");
   }
 }

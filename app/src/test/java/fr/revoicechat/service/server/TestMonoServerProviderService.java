@@ -55,7 +55,7 @@ class TestMonoServerProviderService {
     assertThat(result).hasSize(1);
     var server = result.getFirst();
     assertThat(server).isNotNull();
-    assertThat(server.getName()).isEqualTo("server");
+    assertThat(server.getName()).isEqualTo("Server");
     verify(newServerCreator).create(any());
   }
 

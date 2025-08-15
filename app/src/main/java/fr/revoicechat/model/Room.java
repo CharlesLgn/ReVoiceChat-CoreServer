@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -15,7 +16,10 @@ import jakarta.persistence.Table;
 public class Room implements Serializable {
   @Id
   private UUID id;
+  @Column(nullable = false)
   private String name;
+  @Column(nullable = false)
+  private RoomType type;
   @ManyToOne
   @JoinColumn(name="SERVER_ID", nullable=false)
   private Server server;
@@ -38,6 +42,14 @@ public class Room implements Serializable {
 
   public void setName(final String name) {
     this.name = name;
+  }
+
+  public RoomType getType() {
+    return type;
+  }
+
+  public void setType(final RoomType type) {
+    this.type = type;
   }
 
   public Server getServer() {

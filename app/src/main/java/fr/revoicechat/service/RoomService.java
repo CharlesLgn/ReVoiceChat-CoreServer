@@ -5,8 +5,11 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import fr.revoicechat.error.BadRequestException;
+import fr.revoicechat.error.ResourceNotFoundException;
 import fr.revoicechat.model.Room;
 import fr.revoicechat.repository.RoomRepository;
+import fr.revoicechat.representation.room.RoomRepresentation;
 
 /**
  * Service responsible for managing {@link Room} entities.
@@ -44,11 +47,15 @@ public class RoomService {
    * Creates and stores a new room in the database.
    *
    * @param id the server id
-   * @param room the room entity to persist
+   * @param representation the room entity to persist
    * @return the persisted room entity with its generated ID
-   * @throws java.util.NoSuchElementException if no server with the given ID exists
+   * @throws ResourceNotFoundException if no server with the given ID exists
    */
-  public Room create(final UUID id, final Room room) {
+  public Room create(final UUID id, final RoomRepresentation representation) {
+    var room = new Room();
+    room.setId(UUID.randomUUID());
+    room.setType(representation.type());
+    room.setName(representation.name());
     var server = serverService.get(id);
     room.setServer(server);
     return repository.save(room);
@@ -59,9 +66,42 @@ public class RoomService {
    *
    * @param roomId the unique room ID
    * @return the room entity
-   * @throws java.util.NoSuchElementException if no room with the given ID exists
+   * @throws ResourceNotFoundException if no room with the given ID exists
    */
-  public Room get(final UUID roomId) {
-    return repository.findById(roomId).orElseThrow();
+  public Room read(final UUID roomId) {
+    return getRoom(roomId);
+  }
+
+  /**
+   * Update and stores a room in the database.
+   *
+   * @param id the room id
+   * @param representation the room entity to persist
+   * @return the persisted room entity
+   * @throws ResourceNotFoundException if no server with the given ID exists
+   */
+  public Room update(final UUID id, final RoomRepresentation representation) {
+    var room = getRoom(id);
+    if (representation.type() != null && room.getType() != representation.type()) {
+      throw new BadRequestException("You cannot change the type of a room. please create a new one.");
+    }
+    room.setName(representation.name());
+    return repository.save(room);
+  }
+
+  /**
+   * Creates and stores a new room in the database.
+   *
+   * @param id the server id
+   * @return the persisted room entity with its generated ID
+   * @throws ResourceNotFoundException if no server with the given ID exists
+   */
+  public UUID delete(final UUID id) {
+    repository.deleteById(id);
+    return id;
+  }
+
+  private Room getRoom(final UUID roomId) {
+    return repository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException(Room.class, roomId));
   }
 }

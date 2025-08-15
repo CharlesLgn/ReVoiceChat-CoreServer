@@ -31,6 +31,6 @@ public class RoomController {
 
   @PutMapping
   public Room createRoom(@PathVariable final UUID id, @RequestBody RoomRepresentation representation) {
-    return roomService.create(id, representation.toEntity());
+    return roomService.create(id, representation);
   }
 }

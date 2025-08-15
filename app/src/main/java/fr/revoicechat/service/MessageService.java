@@ -1,10 +1,14 @@
 package fr.revoicechat.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import fr.revoicechat.error.BadRequestException;
+import fr.revoicechat.error.ResourceNotFoundException;
 import fr.revoicechat.model.Message;
 import fr.revoicechat.repository.MessageRepository;
 import fr.revoicechat.representation.message.CreatedMessageRepresentation;
@@ -12,6 +16,30 @@ import fr.revoicechat.representation.message.MessageRepresentation;
 import fr.revoicechat.representation.message.MessageRepresentation.ActionType;
 import jakarta.transaction.Transactional;
 
+/**
+ * Service layer for managing chat messages within rooms.
+ * <p>
+ * This service provides operations to create, retrieve, update, and delete messages.
+ * It acts as an intermediary between the {@link MessageRepository} (data access layer)
+ * and higher-level components such as controllers or WebSocket endpoints.
+ * </p>
+ * <p>
+ * In addition to persisting messages, this service interacts with the
+ * {@link TextualChatService} to broadcast message-related events (additions, updates,
+ * removals) to connected clients in real-time.
+ * </p>
+ *
+ * <h2>Responsibilities:</h2>
+ * <ul>
+ *   <li>Manage message persistence for specific chat rooms</li>
+ *   <li>Transform domain entities into {@link MessageRepresentation} objects</li>
+ *   <li>Notify clients about message events via the textual chat service</li>
+ * </ul>
+ *
+ * @see MessageRepository
+ * @see TextualChatService
+ * @see RoomService
+ */
 @Service
 public class MessageService {
 
@@ -38,9 +66,21 @@ public class MessageService {
                             .toList();
   }
 
+  /**
+   * Creates and persists a new message in the specified chat room.
+   * Also notifies connected clients about the new message.
+   *
+   * @param roomId   the unique identifier of the chat room where the message will be added
+   * @param creation the message data to create
+   * @return a representation of the created message
+   */
   public MessageRepresentation create(UUID roomId, CreatedMessageRepresentation creation) {
-    var room = roomService.get(roomId);
-    var message = creation.toEntity();
+    isValid(creation);
+    var room = roomService.read(roomId);
+    var message = new Message();
+    message.setId(UUID.randomUUID());
+    message.setText(creation.text());
+    message.setCreatedDate(LocalDateTime.now());
     message.setRoom(room);
     messageRepository.save(message);
     var representation = toRepresantation(message, ActionType.ADD);
@@ -48,13 +88,29 @@ public class MessageService {
     return representation;
   }
 
+  /**
+   * Retrieves the details of a specific message.
+   *
+   * @param id the unique identifier of the message
+   * @return a representation of the message
+   * @throws ResourceNotFoundException if the message does not exist
+   */
   public MessageRepresentation read(UUID id) {
-    var message = messageRepository.findById(id).orElseThrow();
+    var message = getMessage(id);
     return toRepresantation(message, null);
   }
 
+
+  /**
+   * Updates the content of an existing message and notifies connected clients.
+   *
+   * @param id       the unique identifier of the message to update
+   * @param creation the new message content
+   * @return a representation of the updated message
+   * @throws ResourceNotFoundException if the message does not exist
+   */
   public MessageRepresentation update(UUID id, CreatedMessageRepresentation creation) {
-    var message = messageRepository.findById(id).orElseThrow();
+    var message = getMessage(id);
     message.setText(creation.text());
     messageRepository.save(message);
     var representation = toRepresantation(message, ActionType.MODIFY);
@@ -62,12 +118,31 @@ public class MessageService {
     return representation;
   }
 
+  /**
+   * Deletes a message from the repository and notifies connected clients.
+   *
+   * @param id the unique identifier of the message to delete
+   * @return the UUID of the deleted message
+   * @throws ResourceNotFoundException if the message does not exist
+   */
   public UUID delete(UUID id) {
-    var message = messageRepository.findById(id).orElseThrow();
+    var message = getMessage(id);
     var room = message.getRoom().getId();
     messageRepository.deleteById(id);
     textualChatService.send(room, new MessageRepresentation(id, null, room, null, ActionType.REMOVE));
     return id;
+  }
+
+  private void isValid(final CreatedMessageRepresentation creation) {
+    if (StringUtils.isBlank(creation.text())) {
+      throw new BadRequestException("message cannot be empty");
+    }
+  }
+
+  private Message getMessage(final UUID id) {
+    return messageRepository
+        .findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException(Message.class, id));
   }
 
   private MessageRepresentation toRepresantation(final Message message, final ActionType actionType) {

@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import fr.revoicechat.model.Room;
+import fr.revoicechat.model.RoomType;
 import fr.revoicechat.model.Server;
 import fr.revoicechat.repository.RoomRepository;
 import fr.revoicechat.repository.ServerRepository;
@@ -41,18 +42,25 @@ class TestNewServerCreator {
     creator.create(server);
     // Then
     softly.assertThat(server.getId()).isNotNull();
-    assertThat(rooms).hasSize(2);
-    var room1 = rooms.getFirst();
-    softly.assertThat(room1.getId()).isNotNull();
-    softly.assertThat(room1.getName()).isEqualTo("General");
-    softly.assertThat(room1.getServer()).isEqualTo(server);
-    var room2 = rooms.getLast();
-    softly.assertThat(room2.getId()).isNotNull();
-    softly.assertThat(room2.getName()).isEqualTo("Random");
-    softly.assertThat(room2.getServer()).isEqualTo(server);
+    assertThat(rooms).hasSize(3);
+    var room1 = rooms.get(0);
+    assertRoom(softly, room1, "General", server, RoomType.TEXT);
+    var room2 = rooms.get(1);
+    assertRoom(softly, room2, "Random", server, RoomType.TEXT);
+    var room3 = rooms.get(2);
+    assertRoom(softly, room3, "🔊 Vocal", server, RoomType.WEBRTC);
+
     verify(serverRepository).save(server);
     verify(roomRepository).save(room1);
     verify(roomRepository).save(room2);
+    verify(roomRepository).save(room3);
     verifyNoMoreInteractions(serverRepository, roomRepository);
+  }
+
+  private static void assertRoom(final SoftAssertions softly, final Room room1, final String General, final Server server, final RoomType text) {
+    softly.assertThat(room1.getId()).isNotNull();
+    softly.assertThat(room1.getName()).isEqualTo(General);
+    softly.assertThat(room1.getServer()).isEqualTo(server);
+    softly.assertThat(room1.getType()).isEqualTo(text);
   }
 }

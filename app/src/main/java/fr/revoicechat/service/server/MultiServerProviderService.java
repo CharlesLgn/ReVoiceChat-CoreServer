@@ -25,7 +25,7 @@ public class MultiServerProviderService implements ServerProviderService {
   /** This implementation always allows usage. */
   @Override
   public void canBeUsed() {
-    LOG.info("Multi server mode : can be used");
+    LOG.info("Multi server mode : enabled");
   }
 
   /** @return list of all servers, possibly empty */

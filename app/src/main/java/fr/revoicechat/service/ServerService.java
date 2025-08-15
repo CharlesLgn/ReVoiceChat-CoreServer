@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import fr.revoicechat.error.ResourceNotFoundException;
 import fr.revoicechat.model.Server;
 import fr.revoicechat.repository.ServerRepository;
 import fr.revoicechat.service.server.ServerProviderService;
@@ -60,7 +61,7 @@ public class ServerService {
    * @throws java.util.NoSuchElementException if no server with the given ID exists
    */
   public Server get(final UUID id) {
-    return serverRepository.findById(id).orElseThrow();
+    return serverRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Server.class, id));
   }
 
   /**
