@@ -4,3 +4,6 @@ spring:
 revoicechat:
   global:
     sever-mode: MONO_SERVER
+logging:
+  file:
+    name: latest.log
