@@ -25,16 +25,23 @@ class GenerateOneUserAtTheBeginning {
   @PostConstruct
   @Transactional
   public void init() {
-    if (userRepository.count() < 1) {
+    if (userRepository.count() == 0) {
       LOG.info("default admin user generated");
-      var user = new User();
-      user.setId(UUID.randomUUID());
-      user.setLogin("admin");
-      user.setUsername("admin");
-      user.setPassword("psw");
-      user.setEmail("--no-email--");
-      user.setCreatedDate(LocalDateTime.now());
-      userRepository.save(user);
+      addUser("user");
+      addUser("admin");
+      addUser("rex_woof");
+      addUser("nyphew");
     }
+  }
+
+  private void addUser(final String login) {
+    var user = new User();
+    user.setId(UUID.randomUUID());
+    user.setLogin(login);
+    user.setUsername(login);
+    user.setPassword("psw");
+    user.setEmail("--no-email--");
+    user.setCreatedDate(LocalDateTime.now());
+    userRepository.save(user);
   }
 }
