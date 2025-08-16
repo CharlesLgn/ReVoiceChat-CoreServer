@@ -1,0 +1,1 @@
+./mvnw spring-boot:run -pl "app" -Dspring-boot.run.profiles=dev,linux
