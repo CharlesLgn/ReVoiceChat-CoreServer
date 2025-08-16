@@ -50,11 +50,12 @@ public class TextualChatService {
    * @return the SSE emitter for streaming messages to the client
    */
   public SseEmitter register(final User user) {
+    var id = user.getId();
     SseEmitter emitter = new SseEmitter(0L);
-    emitter.onCompletion(() -> remove(user, emitter, () -> LOG.info("complete")));
-    emitter.onError(e -> remove(user, emitter, () -> LOG.error("error", e)));
-    emitter.onTimeout(() -> remove(user, emitter, () -> LOG.error("timeout")));
-    getSseEmitters(user).add(emitter);
+    emitter.onCompletion(() -> remove(id, emitter, () -> LOG.info("complete")));
+    emitter.onError(e       -> remove(id, emitter, () -> LOG.error("error", e)));
+    emitter.onTimeout(()    -> remove(id, emitter, () -> LOG.error("timeout")));
+    getSseEmitters(id).add(emitter);
     return emitter;
   }
 
@@ -69,6 +70,7 @@ public class TextualChatService {
    */
   public void send(final UUID roomId, MessageRepresentation message) {
     roomUserFinder.find(roomId)
+                  .map(User::getId)
                   .map(this::getSseEmitters)
                   .flatMap(Collection::stream)
                   .forEach(sse -> sendSSE(sse, message));
@@ -82,12 +84,12 @@ public class TextualChatService {
     }
   }
 
-  private Collection<SseEmitter> getSseEmitters(final User user) {
-    return emitters.computeIfAbsent(user.getId(), key -> synchronizedSet(new HashSet<>()));
+  private Collection<SseEmitter> getSseEmitters(final UUID userId) {
+    return emitters.computeIfAbsent(userId, key -> synchronizedSet(new HashSet<>()));
   }
 
-  private void remove(final User user, SseEmitter emitter, Runnable log) {
-    getSseEmitters(user).remove(emitter);
+  private void remove(final UUID userId, SseEmitter emitter, Runnable log) {
+    getSseEmitters(userId).remove(emitter);
     log.run();
   }
 }

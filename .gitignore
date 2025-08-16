@@ -34,3 +34,4 @@ build/
 .vscode/
 
 latest.log
+latest.log.*.gz
