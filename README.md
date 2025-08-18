@@ -22,6 +22,12 @@ for server purpose, you can copy the `server.exemple.properties` file in `/app`,
 rename it `server.properties`
 and complete it with your postgres database
 
+### run the jar
+
+ - copy the jar where you want and rename it `revoicechat-app.jar`
+ - copy the `server.properties` in the same place of `revoicechat-app.jar`
+ - run `java -jar ./revoicechat-app.jar --spring.profiles.active=linux,pg`
+
 ## Voice (VoIP)
 
 ### Prerequisite
