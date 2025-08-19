@@ -14,7 +14,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   @Query("""
       select u
       from User u
-      join Server s on u.servers
+      join u.servers s
       where s.id = :serverID""")
   Stream<User> findByServers(UUID serverID);
 }
