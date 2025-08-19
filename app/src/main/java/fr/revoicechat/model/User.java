@@ -12,7 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -28,10 +27,6 @@ public class User implements Serializable {
   @Column(nullable = false)
   private String username;
   private String password;
-  @ManyToOne
-  @JoinColumn(name="PROFIL_PICTURE_ID")
-  private MediaData profilPicture;
-
   @ManyToMany
   @JoinTable(name = "RVC_SERVER_USER",
       joinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "ID"),
@@ -90,14 +85,6 @@ public class User implements Serializable {
 
   public void setCreatedDate(final LocalDateTime createdDate) {
     this.createdDate = createdDate;
-  }
-
-  public MediaData getProfilPicture() {
-    return profilPicture;
-  }
-
-  public void setProfilPicture(final MediaData profilPicture) {
-    this.profilPicture = profilPicture;
   }
 
   public List<Server> getServers() {

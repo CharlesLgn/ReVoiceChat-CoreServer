@@ -12,7 +12,7 @@ import fr.revoicechat.error.ResourceNotFoundException;
 import fr.revoicechat.model.Message;
 import fr.revoicechat.repository.MessageRepository;
 import fr.revoicechat.representation.message.CreatedMessageRepresentation;
-import fr.revoicechat.representation.message.MediaDataRepresentation;
+import fr.revoicechat.representation.message.CreatedMessageRepresentation.CreatedMediaDataRepresentation;
 import fr.revoicechat.representation.message.MessageRepresentation;
 import fr.revoicechat.representation.message.MessageRepresentation.ActionType;
 import fr.revoicechat.representation.message.MessageRepresentation.UserMessageRepresentation;
@@ -136,7 +136,13 @@ public class MessageService {
     var message = getMessage(id);
     var room = message.getRoom().getId();
     messageRepository.deleteById(id);
-    textualChatService.send(room, new MessageRepresentation(id, null, room, null, null, ActionType.REMOVE));
+    textualChatService.send(room, new MessageRepresentation(id,
+        null,
+        room,
+        null,
+        null,
+        ActionType.REMOVE,
+        null));
     return id;
   }
 
@@ -144,7 +150,7 @@ public class MessageService {
     if (StringUtils.isBlank(creation.text())) {
       throw new BadRequestException("message cannot be empty");
     }
-    if (creation.medias().stream().map(MediaDataRepresentation::name).anyMatch(StringUtils::isBlank)) {
+    if (creation.medias().stream().map(CreatedMediaDataRepresentation::name).anyMatch(StringUtils::isBlank)) {
       throw new BadRequestException("a media should have a name");
     }
   }
@@ -165,7 +171,8 @@ public class MessageService {
             message.getUser().getUsername()
         ),
         message.getCreatedDate(),
-        actionType
+        actionType,
+        List.of()
     );
   }
 }
