@@ -12,14 +12,17 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
+import fr.revoicechat.junit.ClearDataBase;
 import fr.revoicechat.model.ActiveStatus;
 import fr.revoicechat.representation.user.SignupRepresentation;
 import fr.revoicechat.web.api.AuthController;
 import fr.revoicechat.web.api.AuthController.UserPassword;
 
+/** @see AuthControllerImpl */
 @SpringBootTest
 @ActiveProfiles({ "test", "test-h2" })
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@ClearDataBase
 class TestAuthController {
 
   @Inject private AuthController authController;

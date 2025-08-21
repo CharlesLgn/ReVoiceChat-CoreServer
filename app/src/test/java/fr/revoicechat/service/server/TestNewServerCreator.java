@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.persistence.EntityManager;
 
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
@@ -18,43 +19,40 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import fr.revoicechat.model.Room;
 import fr.revoicechat.model.RoomType;
 import fr.revoicechat.model.Server;
-import fr.revoicechat.repository.RoomRepository;
-import fr.revoicechat.repository.ServerRepository;
 
 @ExtendWith({MockitoExtension.class, SoftAssertionsExtension.class})
 class TestNewServerCreator {
 
-  @Mock private ServerRepository serverRepository;
-  @Mock private RoomRepository roomRepository;
+  @Mock private EntityManager entityManager;
   @InjectMocks private NewServerCreator creator;
 
   @Test
   void test(SoftAssertions softly) {
     // Given
-    List<Room> rooms = new ArrayList<>();
+    List<Object> saved = new ArrayList<>();
     doAnswer(invocationOnMock -> {
-      Room room = invocationOnMock.getArgument(0);
-      rooms.add(room);
-      return room;
-    }).when(roomRepository).save(any());
+      Object o = invocationOnMock.getArgument(0);
+      saved.add(o);
+      return o;
+    }).when(entityManager).persist(any());
     Server server = new Server();
     // When
     creator.create(server);
     // Then
     softly.assertThat(server.getId()).isNotNull();
-    assertThat(rooms).hasSize(3);
-    var room1 = rooms.get(0);
+    assertThat(saved).hasSize(4);
+    Room room1 = (Room) saved.get(1);
     assertRoom(softly, room1, "📝 General", server, RoomType.TEXT);
-    var room2 = rooms.get(1);
+    Room room2 = (Room) saved.get(2);
     assertRoom(softly, room2, "📝 Random", server, RoomType.TEXT);
-    var room3 = rooms.get(2);
+    Room room3 = (Room) saved.get(3);
     assertRoom(softly, room3, "🔊 Vocal", server, RoomType.WEBRTC);
 
-    verify(serverRepository).save(server);
-    verify(roomRepository).save(room1);
-    verify(roomRepository).save(room2);
-    verify(roomRepository).save(room3);
-    verifyNoMoreInteractions(serverRepository, roomRepository);
+    verify(entityManager).persist(server);
+    verify(entityManager).persist(room1);
+    verify(entityManager).persist(room2);
+    verify(entityManager).persist(room3);
+    verifyNoMoreInteractions(entityManager);
   }
 
   private static void assertRoom(final SoftAssertions softly, final Room room1, final String General, final Server server, final RoomType text) {

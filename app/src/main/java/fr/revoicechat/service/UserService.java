@@ -3,15 +3,16 @@ package fr.revoicechat.service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import fr.revoicechat.model.ActiveStatus;
 import fr.revoicechat.model.User;
-import fr.revoicechat.repository.UserRepository;
 import fr.revoicechat.representation.user.SignupRepresentation;
 import fr.revoicechat.representation.user.UserRepresentation;
 import fr.revoicechat.security.PasswordUtil;
@@ -22,18 +23,22 @@ import fr.revoicechat.service.sse.TextualChatService;
 @Service
 public class UserService {
 
-  private final UserRepository userRepository;
+  private final EntityManager entityManager;
   private final UserHolder userHolder;
   private final TextualChatService textualChatService;
   private final ServerProviderService serverProviderService;
 
-  public UserService(final UserRepository userRepository, final UserHolder userHolder, final TextualChatService textualChatService, @Qualifier("serverProviderService") final ServerProviderService serverProviderService) {
-    this.userRepository = userRepository;
+  public UserService(EntityManager entityManager,
+                     UserHolder userHolder,
+                     TextualChatService textualChatService,
+                     ServerProviderService serverProviderService) {
+    this.entityManager = entityManager;
     this.userHolder = userHolder;
     this.textualChatService = textualChatService;
     this.serverProviderService = serverProviderService;
   }
 
+  @Transactional
   public UserRepresentation create(final SignupRepresentation signer) {
     var user = new User();
     user.setId(UUID.randomUUID());
@@ -42,7 +47,7 @@ public class UserService {
     user.setLogin(signer.username());
     user.setEmail(signer.email());
     user.setPassword(PasswordUtil.encodePassword(signer.password()));
-    userRepository.save(user);
+    entityManager.persist(user);
     return map(user);
   }
 
@@ -51,9 +56,9 @@ public class UserService {
   }
 
   public UserRepresentation get(final UUID id) {
-    return userRepository.findById(id)
-                         .map(this::map)
-                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    return Optional.ofNullable(entityManager.find(User.class, id))
+                   .map(this::map)
+                   .orElseThrow(() -> new UsernameNotFoundException("User not found"));
   }
 
   private UserRepresentation map(final User user) {
@@ -70,6 +75,7 @@ public class UserService {
     return textualChatService.isRegister(user) ? ActiveStatus.ONLINE : ActiveStatus.OFFLINE;
   }
 
+  @Transactional
   public List<UserRepresentation> fetchUserForServer(final UUID id) {
     return serverProviderService.getUsers(id).map(this::map).toList();
   }

@@ -1,7 +1,10 @@
 package fr.revoicechat.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
@@ -27,10 +30,12 @@ import fr.revoicechat.representation.room.RoomRepresentation;
 @Service
 public class RoomService {
 
+  private final EntityManager entityManager;
   private final RoomRepository repository;
   private final ServerService serverService;
 
-  public RoomService(final RoomRepository repository, final ServerService serverService) {
+  public RoomService(EntityManager entityManager, final RoomRepository repository, final ServerService serverService) {
+    this.entityManager = entityManager;
     this.repository = repository;
     this.serverService = serverService;
   }
@@ -52,6 +57,7 @@ public class RoomService {
    * @return the persisted room entity with its generated ID
    * @throws ResourceNotFoundException if no server with the given ID exists
    */
+  @Transactional
   public Room create(final UUID id, final RoomRepresentation representation) {
     var room = new Room();
     room.setId(UUID.randomUUID());
@@ -59,7 +65,8 @@ public class RoomService {
     room.setName(representation.name());
     var server = serverService.get(id);
     room.setServer(server);
-    return repository.save(room);
+    entityManager.persist(room);
+    return room;
   }
 
   /**
@@ -81,13 +88,15 @@ public class RoomService {
    * @return the persisted room entity
    * @throws ResourceNotFoundException if no server with the given ID exists
    */
+  @Transactional
   public Room update(final UUID id, final RoomRepresentation representation) {
     var room = getRoom(id);
     if (representation.type() != null && room.getType() != representation.type()) {
       throw new BadRequestException(RoomErrorCode.ROOM_TYPE_CANNOT_BE_CHANGED);
     }
     room.setName(representation.name());
-    return repository.save(room);
+    entityManager.persist(room);
+    return room;
   }
 
   /**
@@ -98,11 +107,13 @@ public class RoomService {
    * @throws ResourceNotFoundException if no server with the given ID exists
    */
   public UUID delete(final UUID id) {
-    repository.deleteById(id);
+    Optional.ofNullable(entityManager.find(Room.class, id))
+                .ifPresent(entityManager::remove);
     return id;
   }
 
   private Room getRoom(final UUID roomId) {
-    return repository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException(Room.class, roomId));
+    return Optional.ofNullable(entityManager.find(Room.class, roomId))
+                   .orElseThrow(() -> new ResourceNotFoundException(Room.class, roomId));
   }
 }
