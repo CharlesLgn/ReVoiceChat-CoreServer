@@ -1,7 +1,10 @@
 package fr.revoicechat.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import fr.revoicechat.error.ResourceNotFoundException;
 import fr.revoicechat.model.Server;
-import fr.revoicechat.repository.ServerRepository;
+import fr.revoicechat.model.ServerUser;
 import fr.revoicechat.representation.server.ServerCreationRepresentation;
 import fr.revoicechat.security.UserHolder;
 import fr.revoicechat.service.server.ServerProviderService;
@@ -27,20 +30,22 @@ import fr.revoicechat.service.server.ServerProviderService;
  * </ul>
  * <p>
  * The list of servers returned by {@link #getAll()} comes from {@link ServerProviderService},
- * whereas other CRUD operations interact directly with {@link ServerRepository}.
+ * whereas other CRUD operations.
  */
 @Service
 public class ServerService {
   private static final Logger LOG = LoggerFactory.getLogger(ServerService.class);
 
   private final ServerProviderService serverProviderService;
-  private final ServerRepository serverRepository;
   private final UserHolder userHolder;
+  private final EntityManager entityManager;
 
-  public ServerService(ServerProviderService serverProviderService, final ServerRepository serverRepository, final UserHolder userHolder) {
+  public ServerService(ServerProviderService serverProviderService,
+                       UserHolder userHolder,
+                       EntityManager entityManager) {
     this.serverProviderService = serverProviderService;
-    this.serverRepository = serverRepository;
     this.userHolder = userHolder;
+    this.entityManager = entityManager;
   }
 
   /**
@@ -65,7 +70,8 @@ public class ServerService {
    * @throws java.util.NoSuchElementException if no server with the given ID exists
    */
   public Server get(final UUID id) {
-    return serverRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Server.class, id));
+    return Optional.ofNullable(entityManager.find(Server.class, id))
+                   .orElseThrow(() -> new ResourceNotFoundException(Server.class, id));
   }
 
   /**
@@ -74,12 +80,19 @@ public class ServerService {
    * @param representation the server entity to persist
    * @return the persisted server entity with its generated ID
    */
+  @Transactional
   public Server create(final ServerCreationRepresentation representation) {
     Server server = new Server();
     server.setId(UUID.randomUUID());
     server.setName(representation.name());
+    var owner = userHolder.get();
     server.setOwner(userHolder.get());
-    return serverProviderService.create(server);
+    serverProviderService.create(server);
+    ServerUser serverUser = new ServerUser();
+    serverUser.setServer(server);
+    serverUser.setUser(owner);
+    entityManager.persist(serverUser);
+    return server;
   }
 
   /**
@@ -92,9 +105,11 @@ public class ServerService {
    * @param representation the updated server data
    * @return the updated and persisted server entity
    */
+  @Transactional
   public Server update(final UUID id, final ServerCreationRepresentation representation) {
     var server = get(id);
     server.setName(representation.name());
-    return serverRepository.save(server);
+    entityManager.persist(server);
+    return server;
   }
 }

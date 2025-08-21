@@ -1,9 +1,10 @@
 package fr.revoicechat.repository;
 
-import java.util.UUID;
-
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
 import fr.revoicechat.model.Server;
 
-public interface ServerRepository extends JpaRepository<Server, UUID> {}
+public interface ServerRepository {
+  long count();
+  List<Server> findAll();
+}

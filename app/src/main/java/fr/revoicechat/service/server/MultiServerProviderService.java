@@ -24,9 +24,11 @@ public class MultiServerProviderService implements ServerProviderService {
 
   private final ServerRepository serverRepository;
   private final UserRepository userRepository;
+  private final NewServerCreator newServerCreator;
 
-  public MultiServerProviderService(final ServerRepository serverRepository, final UserRepository userRepository) {this.serverRepository = serverRepository;
+  public MultiServerProviderService(final ServerRepository serverRepository, final UserRepository userRepository, final NewServerCreator newServerCreator) {this.serverRepository = serverRepository;
     this.userRepository = userRepository;
+    this.newServerCreator = newServerCreator;
   }
 
   /** This implementation always allows usage. */
@@ -49,7 +51,7 @@ public class MultiServerProviderService implements ServerProviderService {
   @Override
   public Server create(final Server entity) {
     LOG.info("Creation of server {}", entity.getName());
-    return serverRepository.save(entity);
+    return newServerCreator.create(entity);
   }
 
 

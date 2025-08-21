@@ -3,12 +3,11 @@ package fr.revoicechat.service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import fr.revoicechat.error.ResourceNotFoundException;
@@ -17,8 +16,8 @@ import fr.revoicechat.model.MediaData;
 import fr.revoicechat.model.MediaDataStatus;
 import fr.revoicechat.model.MediaOrigin;
 import fr.revoicechat.model.Message;
-import fr.revoicechat.repository.MediaDataRepository;
 import fr.revoicechat.repository.MessageRepository;
+import fr.revoicechat.repository.page.PageResult;
 import fr.revoicechat.representation.message.CreatedMessageRepresentation;
 import fr.revoicechat.representation.message.CreatedMessageRepresentation.CreatedMediaDataRepresentation;
 import fr.revoicechat.representation.message.MessageRepresentation;
@@ -27,7 +26,6 @@ import fr.revoicechat.representation.message.MessageRepresentation.UserMessageRe
 import fr.revoicechat.security.UserHolder;
 import fr.revoicechat.service.message.MessageValidation;
 import fr.revoicechat.service.sse.TextualChatService;
-import jakarta.transaction.Transactional;
 
 /**
  * Service layer for managing chat messages within rooms.
@@ -48,7 +46,6 @@ import jakarta.transaction.Transactional;
  *   <li>Transform domain entities into {@link MessageRepresentation} objects</li>
  *   <li>Notify clients about message events via the textual chat service</li>
  * </ul>
- *
  * @see MessageRepository
  * @see TextualChatService
  * @see RoomService
@@ -56,47 +53,45 @@ import jakarta.transaction.Transactional;
 @Service
 public class MessageService {
 
+  private final EntityManager entityManager;
   private final MessageRepository messageRepository;
   private final TextualChatService textualChatService;
   private final RoomService roomService;
   private final UserHolder userHolder;
-  private final MediaDataRepository mediaDataRepository;
   private final MessageValidation messageValidation;
 
-  public MessageService(final MessageRepository messageRepository, final TextualChatService textualChatService, final RoomService roomService, final UserHolder userHolder, final MediaDataRepository mediaDataRepository, final MessageValidation messageValidation) {
+  public MessageService(EntityManager entityManager,
+                        MessageRepository messageRepository,
+                        TextualChatService textualChatService,
+                        RoomService roomService,
+                        UserHolder userHolder,
+                        MessageValidation messageValidation) {
+    this.entityManager = entityManager;
     this.messageRepository = messageRepository;
     this.textualChatService = textualChatService;
     this.roomService = roomService;
     this.userHolder = userHolder;
-    this.mediaDataRepository = mediaDataRepository;
     this.messageValidation = messageValidation;
   }
 
   /**
    * Retrieves all messages for a given chat room.
-   *
    * @param roomId the unique identifier of the chat room
    * @return list of messages in the room, possibly empty if no messages exist
    */
   @Transactional
-  public List<MessageRepresentation> findAll(final UUID roomId) {
-    return messageRepository.findByRoomId(roomId)
-                            .map(message -> toRepresantation(message, null))
-                            .toList();
-  }
-
-  @Transactional
-  public Page<MessageRepresentation> getMessagesByRoom(UUID roomId, int page, int size) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
-    return messageRepository.findByRoomId(roomId, pageable).map(
-        message -> toRepresantation(message, null)
-    );
+  public PageResult<MessageRepresentation> getMessagesByRoom(UUID roomId, int page, int size) {
+    var pageResult = messageRepository.findByRoomId(roomId, page, size);
+    return new PageResult<>(pageResult.content()
+                                      .stream()
+                                      .map(message -> toRepresantation(message, null))
+                                      .toList(),
+                            pageResult.pageNumber(), pageResult.pageSize(), pageResult.totalElements());
   }
 
   /**
    * Creates and persists a new message in the specified chat room.
    * Also notifies connected clients about the new message.
-   *
    * @param roomId   the unique identifier of the chat room where the message will be added
    * @param creation the message data to create
    * @return a representation of the created message
@@ -111,7 +106,7 @@ public class MessageService {
     message.setRoom(room);
     message.setUser(userHolder.get());
     creation.medias().stream().map(this::create).forEach(message::addMediaData);
-    messageRepository.save(message);
+    entityManager.persist(message);
     var representation = toRepresantation(message, ActionType.ADD);
     textualChatService.send(room.getId(), representation);
     return representation;
@@ -126,13 +121,12 @@ public class MessageService {
     mediaData.setType(FileType.PICTURE);
     mediaData.setOrigin(MediaOrigin.ATTACHMENT);
     mediaData.setStatus(MediaDataStatus.DOWNLOADING);
-    mediaDataRepository.save(mediaData);
+    entityManager.persist(mediaData);
     return mediaData;
   }
 
   /**
    * Retrieves the details of a specific message.
-   *
    * @param id the unique identifier of the message
    * @return a representation of the message
    * @throws ResourceNotFoundException if the message does not exist
@@ -145,7 +139,6 @@ public class MessageService {
 
   /**
    * Updates the content of an existing message and notifies connected clients.
-   *
    * @param id       the unique identifier of the message to update
    * @param creation the new message content
    * @return a representation of the updated message
@@ -154,7 +147,7 @@ public class MessageService {
   public MessageRepresentation update(UUID id, CreatedMessageRepresentation creation) {
     var message = getMessage(id);
     message.setText(creation.text());
-    messageRepository.save(message);
+    entityManager.persist(message);
     var representation = toRepresantation(message, ActionType.MODIFY);
     textualChatService.send(message.getRoom().getId(), representation);
     return representation;
@@ -162,7 +155,6 @@ public class MessageService {
 
   /**
    * Deletes a message from the repository and notifies connected clients.
-   *
    * @param id the unique identifier of the message to delete
    * @return the UUID of the deleted message
    * @throws ResourceNotFoundException if the message does not exist
@@ -170,21 +162,20 @@ public class MessageService {
   public UUID delete(UUID id) {
     var message = getMessage(id);
     var room = message.getRoom().getId();
-    messageRepository.deleteById(id);
+    entityManager.remove(message);
     textualChatService.send(room, new MessageRepresentation(id,
-        null,
-        room,
-        null,
-        null,
-        ActionType.REMOVE,
-        null));
+                                                            null,
+                                                            room,
+                                                            null,
+                                                            null,
+                                                            ActionType.REMOVE,
+                                                            null));
     return id;
   }
 
   private Message getMessage(final UUID id) {
-    return messageRepository
-        .findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException(Message.class, id));
+    return Optional.ofNullable(entityManager.find(Message.class, id))
+                   .orElseThrow(() -> new ResourceNotFoundException(Message.class, id));
   }
 
   private MessageRepresentation toRepresantation(final Message message, final ActionType actionType) {

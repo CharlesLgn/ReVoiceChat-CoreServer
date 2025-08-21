@@ -1,25 +1,18 @@
 package fr.revoicechat.junit;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import fr.revoicechat.model.User;
-import fr.revoicechat.stub.UserHolderMock;
+@Order(2)
+public class ClearDataBaseExtension implements BeforeEachCallback, TestInstancePostProcessor {
 
-@Order(1)
-public class ConnectUserExtension implements BeforeEachCallback, AfterEachCallback, TestInstancePostProcessor {
-
-  @Inject UserHolderMock userHolder;
   @Inject EntityManager entityManager;
   @Inject TransactionTemplate transactionTemplate;
 
@@ -33,18 +26,12 @@ public class ConnectUserExtension implements BeforeEachCallback, AfterEachCallba
   @Override
   public void beforeEach(final ExtensionContext context) {
     transactionTemplate.executeWithoutResult(s -> {
-      var user = new User();
-      user.setId(UUID.randomUUID());
-      user.setLogin("test");
-      user.setDisplayName("Test");
-      user.setCreatedDate(LocalDateTime.of(2020, 1, 1, 0, 0));
-      entityManager.persist(user);
-      userHolder.set(user);
+      entityManager.flush();
+      entityManager.clear();
+      entityManager.getMetamodel().getEntities().forEach(entityType -> {
+        String entityName = entityType.getName();
+        entityManager.createQuery("DELETE FROM " + entityName).executeUpdate();
+      });
     });
-  }
-
-  @Override
-  public void afterEach(final ExtensionContext context) throws Exception {
-    userHolder.clean();
   }
 }

@@ -2,7 +2,6 @@ package fr.revoicechat.web.api;
 
 import java.util.UUID;
 
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import fr.revoicechat.model.Room;
+import fr.revoicechat.repository.page.PageResult;
 import fr.revoicechat.representation.message.CreatedMessageRepresentation;
 import fr.revoicechat.representation.message.MessageRepresentation;
 import fr.revoicechat.representation.room.RoomRepresentation;
@@ -102,9 +102,9 @@ public interface RoomController extends LoggedApi {
       }
   )
   @GetMapping("/message")
-  Page<MessageRepresentation> messages(@PathVariable("id") UUID roomId,
-                                       @RequestParam(defaultValue = "0") int page,
-                                       @RequestParam(defaultValue = "50") int size);
+  PageResult<MessageRepresentation> messages(@PathVariable("id") UUID roomId,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "50") int size);
 
   @Operation(
       summary = "Send a message in a room",

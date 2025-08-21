@@ -27,14 +27,15 @@ public class MonoServerProviderService implements ServerProviderService {
   private static final Logger LOG = LoggerFactory.getLogger(MonoServerProviderService.class);
 
   static final String ERROR_MESSAGE = """
-        Your current application can't be run in mono server \
-        because you have more than one existing server""";
+      Your current application can't be run in mono server \
+      because you have more than one existing server""";
 
   private final ServerRepository serverRepository;
   private final NewServerCreator newServerCreator;
   private final UserRepository userRepository;
 
-  public MonoServerProviderService(final ServerRepository serverRepository, final NewServerCreator newServerCreator, final UserRepository userRepository) {this.serverRepository = serverRepository;
+  public MonoServerProviderService(final ServerRepository serverRepository, final NewServerCreator newServerCreator, final UserRepository userRepository) {
+    this.serverRepository = serverRepository;
     this.newServerCreator = newServerCreator;
     this.userRepository = userRepository;
   }
@@ -43,7 +44,6 @@ public class MonoServerProviderService implements ServerProviderService {
    * Ensures that the application is in a valid single-server state.
    * <p>
    * This method throws an exception if more than one server exists.
-   *
    * @throws IllegalStateException if more than one server exists
    */
   @Override
@@ -59,7 +59,6 @@ public class MonoServerProviderService implements ServerProviderService {
    * Returns the single server available in the system, creating one if none exists.
    * <p>
    * Throws an exception if more than one server is present.
-   *
    * @return a list containing the single server
    * @throws IllegalStateException if more than one server exists
    */
@@ -84,7 +83,7 @@ public class MonoServerProviderService implements ServerProviderService {
 
   @Override
   public Server create(final Server entity) {
-    LOG.error(ServerErrorCode.APPLICATION_DOES_NOT_ALLOW_SERVER_CREATION.translate());
+    LOG.error("{}", ServerErrorCode.APPLICATION_DOES_NOT_ALLOW_SERVER_CREATION);
     throw new BadRequestException(ServerErrorCode.APPLICATION_DOES_NOT_ALLOW_SERVER_CREATION);
   }
 }
