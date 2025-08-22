@@ -2,11 +2,13 @@ package fr.revoicechat.web;
 
 import java.util.UUID;
 
-import fr.revoicechat.representation.user.UpdatableUserData;
+import org.springframework.web.bind.annotation.RestController;
+
 import fr.revoicechat.representation.user.UserRepresentation;
 import fr.revoicechat.service.UserService;
 import fr.revoicechat.web.api.UserController;
 
+@RestController
 public class UserControllerImpl implements UserController {
   private final UserService userService;
 
@@ -18,7 +20,7 @@ public class UserControllerImpl implements UserController {
   }
 
   @Override
-  public UserRepresentation get(UUID id) {
+  public UserRepresentation get(final UUID id) {
     return userService.get(id);
   }
 }
