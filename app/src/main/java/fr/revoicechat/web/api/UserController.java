@@ -30,7 +30,9 @@ public interface UserController extends LoggedApi {
 
   @Operation(
       summary = "Update details of the connected user",
-      description = "Update the details of the specific connected user.",
+      description = """
+        Update the details of the specific connected user.
+        Only no null data are updated""",
       tags = { "User" },
       responses = { @ApiResponse(responseCode = "200"), }
   )
