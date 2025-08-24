@@ -1,0 +1,13 @@
+[Unit]
+Description=ReVoiceChat Core Server
+
+[Service]
+Type=simple
+User=administrateur
+Group=administrateur
+
+WorkingDirectory=/srv/rvc/ReVoiceChat-CoreServer/
+ExecStart=/srv/rvc/ReVoiceChat-CoreServer/mvnw spring-boot:run -pl "app" -Dspring-boot.run.profiles=linux,pg
+
+[Install]
+WantedBy=multi-user.target
