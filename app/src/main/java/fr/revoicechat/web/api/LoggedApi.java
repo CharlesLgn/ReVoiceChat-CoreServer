@@ -1,11 +1,10 @@
 package fr.revoicechat.web.api;
 
-import jakarta.annotation.security.RolesAllowed;
-import jakarta.ws.rs.core.MediaType;
-
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+
+import jakarta.ws.rs.core.MediaType;
 
 @APIResponse(
     responseCode = "401",
