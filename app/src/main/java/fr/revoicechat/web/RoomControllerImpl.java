@@ -42,7 +42,8 @@ public class RoomControllerImpl implements RoomController {
 
   @Override
   public PageResult<MessageRepresentation> messages(UUID roomId, int page, int size) {
-    return messageService.getMessagesByRoom(roomId, page, size);
+    var sizeParam = size == 0 ? 50 : size;
+    return messageService.getMessagesByRoom(roomId, page, sizeParam);
   }
 
   @Override
