@@ -88,6 +88,10 @@ public class ServerService {
     return server;
   }
 
+  public void delete(final UUID id) {
+    serverProviderService.delete(id);
+  }
+
   /**
    * Updates an existing server in the database.
    * <p>

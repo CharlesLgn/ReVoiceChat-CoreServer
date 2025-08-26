@@ -10,19 +10,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
 import fr.revoicechat.error.ResourceNotFoundException;
-import fr.revoicechat.model.FileType;
-import fr.revoicechat.model.MediaData;
-import fr.revoicechat.model.MediaDataStatus;
-import fr.revoicechat.model.MediaOrigin;
 import fr.revoicechat.model.Message;
 import fr.revoicechat.repository.MessageRepository;
 import fr.revoicechat.repository.page.PageResult;
 import fr.revoicechat.representation.message.CreatedMessageRepresentation;
-import fr.revoicechat.representation.message.CreatedMessageRepresentation.CreatedMediaDataRepresentation;
 import fr.revoicechat.representation.message.MessageRepresentation;
 import fr.revoicechat.representation.message.MessageRepresentation.ActionType;
 import fr.revoicechat.representation.message.MessageRepresentation.UserMessageRepresentation;
 import fr.revoicechat.security.UserHolder;
+import fr.revoicechat.service.media.MediaDataService;
 import fr.revoicechat.service.message.MessageValidation;
 import fr.revoicechat.service.sse.TextualChatService;
 
@@ -58,19 +54,21 @@ public class MessageService {
   private final RoomService roomService;
   private final UserHolder userHolder;
   private final MessageValidation messageValidation;
+  private final MediaDataService mediaDataService;
 
   public MessageService(EntityManager entityManager,
                         MessageRepository messageRepository,
                         TextualChatService textualChatService,
                         RoomService roomService,
                         UserHolder userHolder,
-                        MessageValidation messageValidation) {
+                        MessageValidation messageValidation, final MediaDataService mediaDataService) {
     this.entityManager = entityManager;
     this.messageRepository = messageRepository;
     this.textualChatService = textualChatService;
     this.roomService = roomService;
     this.userHolder = userHolder;
     this.messageValidation = messageValidation;
+    this.mediaDataService = mediaDataService;
   }
 
   /**
@@ -105,24 +103,11 @@ public class MessageService {
     message.setCreatedDate(LocalDateTime.now());
     message.setRoom(room);
     message.setUser(userHolder.get());
-    creation.medias().stream().map(this::create).forEach(message::addMediaData);
+    creation.medias().stream().map(mediaDataService::create).forEach(message::addMediaData);
     entityManager.persist(message);
     var representation = toRepresantation(message, ActionType.ADD);
     textualChatService.send(room.getId(), representation);
     return representation;
-  }
-
-  // TODO - move to a specific service
-  private MediaData create(final CreatedMediaDataRepresentation creation) {
-    MediaData mediaData = new MediaData();
-    mediaData.setId(UUID.randomUUID());
-    mediaData.setName(creation.name());
-    // TODO - determine file type
-    mediaData.setType(FileType.PICTURE);
-    mediaData.setOrigin(MediaOrigin.ATTACHMENT);
-    mediaData.setStatus(MediaDataStatus.DOWNLOADING);
-    entityManager.persist(mediaData);
-    return mediaData;
   }
 
   /**

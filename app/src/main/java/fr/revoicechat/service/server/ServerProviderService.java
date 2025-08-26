@@ -43,4 +43,9 @@ public interface ServerProviderService {
    * Check if we can create a server, and create it.
    */
   Server create(Server entity);
+
+  /**
+   * Check if we can delete a server, and delete it.
+   */
+  void delete(UUID id);
 }

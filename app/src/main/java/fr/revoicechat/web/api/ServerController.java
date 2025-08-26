@@ -2,6 +2,7 @@ package fr.revoicechat.web.api;
 
 import java.util.List;
 import java.util.UUID;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -70,6 +71,28 @@ public interface ServerController extends LoggedApi {
   @POST
   @Path("/{id}")
   Server updateServer(@PathParam("id") UUID id, ServerCreationRepresentation representation);
+
+  @Operation(summary = "Update an existing server", description = "Update the information of an existing server by its ID.")
+  @APIResponse(responseCode = "200", description = "Server successfully updated")
+  @APIResponse(
+      responseCode = "404",
+      description = "Server not found",
+      content = @Content(
+          mediaType = "text/plain",
+          schema = @Schema(implementation = String.class, examples = "Server not found")
+      )
+  )
+  @APIResponse(
+      responseCode = "400",
+      description = "Server cannot be deleted",
+      content = @Content(
+          mediaType = "text/plain",
+          schema = @Schema(implementation = String.class, examples = "Server cannot be deleted")
+      )
+  )
+  @DELETE
+  @Path("/{id}")
+  void deleteServer(@PathParam("id") UUID id);
 
   @Tags(refs = { "Server", "Room" })
   @Operation(summary = "Get rooms for a server", description = "Retrieve the list of rooms belonging to a specific server.")

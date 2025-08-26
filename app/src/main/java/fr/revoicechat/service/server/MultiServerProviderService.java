@@ -3,7 +3,6 @@ package fr.revoicechat.service.server;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Vetoed;
 
 import org.slf4j.Logger;
