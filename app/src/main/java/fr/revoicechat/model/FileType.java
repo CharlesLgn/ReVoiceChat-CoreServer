@@ -1,5 +1,9 @@
 package fr.revoicechat.model;
 
 public enum FileType {
-  PICTURE, FILE
+  PICTURE,
+  SVG,
+  VIDEO,
+  PDF,
+  OTHER
 }

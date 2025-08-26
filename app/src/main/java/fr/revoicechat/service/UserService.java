@@ -22,6 +22,7 @@ import fr.revoicechat.model.ActiveStatus;
 import fr.revoicechat.model.InvitationLink;
 import fr.revoicechat.model.InvitationLinkStatus;
 import fr.revoicechat.model.User;
+import fr.revoicechat.model.UserType;
 import fr.revoicechat.repository.UserRepository;
 import fr.revoicechat.representation.user.SignupRepresentation;
 import fr.revoicechat.representation.user.UpdatableUserData;
@@ -57,18 +58,26 @@ public class UserService {
 
   @Transactional
   public UserRepresentation create(final SignupRepresentation signer) {
+    if (userRepository.count() == 0) {
+      return generateUser(signer, null, UserType.ADMIN);
+    }
     var invitationLink = Optional.ofNullable(signer.invitationLink())
                                  .map(id -> entityManager.find(InvitationLink.class, id))
                                  .orElse(null);
     if (globalConfig.isAppOnlyAccessibleByInvitation() && !isValideInvitation(invitationLink)) {
       throw new BadRequestException(USER_WITH_NO_VALID_INVITATION);
     }
+    return generateUser(signer, invitationLink, UserType.USER);
+  }
+
+  private UserRepresentation generateUser(SignupRepresentation signer, InvitationLink invitationLink, UserType type) {
     var user = new User();
     user.setId(UUID.randomUUID());
     user.setCreatedDate(LocalDateTime.now());
     user.setDisplayName(signer.username());
     user.setLogin(signer.username());
     user.setEmail(signer.email());
+    user.setType(type);
     user.setPassword(PasswordUtils.encodePassword(signer.password()));
     entityManager.persist(user);
     if (invitationLink != null) {

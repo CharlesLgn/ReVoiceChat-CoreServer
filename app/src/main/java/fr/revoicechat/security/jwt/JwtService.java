@@ -1,6 +1,5 @@
 package fr.revoicechat.security.jwt;
 
-import java.util.Set;
 import jakarta.inject.Singleton;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -19,7 +18,7 @@ public class JwtService {
   public String get(final User user) {
     return Jwt.issuer(jwtIssuer)
               .subject(user.getLogin())
-              .groups(Set.of("USER"))
+              .groups(user.getType().getRoles())
               .expiresAt(System.currentTimeMillis() + 1000L * 3600 * 24 * jwtValidDay)
               .sign();
   }

@@ -49,6 +49,11 @@ public class ServerControllerImpl implements ServerController {
   }
 
   @Override
+  public void deleteServer(final UUID id) {
+    serverService.delete(id);
+  }
+
+  @Override
   public List<Room> getRooms(UUID id) {
     return roomService.findAll(id);
   }

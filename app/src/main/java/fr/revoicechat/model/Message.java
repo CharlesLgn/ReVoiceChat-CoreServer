@@ -1,12 +1,10 @@
 package fr.revoicechat.model;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -19,7 +17,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "RVC_MESSAGE")
-public class Message implements Serializable {
+public class Message {
   @Id
   private UUID id;
   @Lob

@@ -86,4 +86,10 @@ public class MonoServerProviderService implements ServerProviderService {
     LOG.error("{}", ServerErrorCode.APPLICATION_DOES_NOT_ALLOW_SERVER_CREATION);
     throw new BadRequestException(ServerErrorCode.APPLICATION_DOES_NOT_ALLOW_SERVER_CREATION);
   }
+
+  @Override
+  public void delete(final UUID id) {
+    LOG.error("{}", ServerErrorCode.APPLICATION_DOES_NOT_ALLOW_SERVER_DELETION);
+    throw new BadRequestException(ServerErrorCode.APPLICATION_DOES_NOT_ALLOW_SERVER_DELETION);
+  }
 }

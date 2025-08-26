@@ -24,8 +24,8 @@ public class User implements Serializable {
   private String password;
   @Column(nullable = false)
   private ActiveStatus status = ActiveStatus.ONLINE;
-
   private LocalDateTime createdDate;
+  private UserType type = UserType.USER;
 
   public User() {
     super();
@@ -85,6 +85,14 @@ public class User implements Serializable {
 
   public void setStatus(final ActiveStatus status) {
     this.status = status;
+  }
+
+  public UserType getType() {
+    return type;
+  }
+
+  public void setType(final UserType type) {
+    this.type = type;
   }
 
   @Override
