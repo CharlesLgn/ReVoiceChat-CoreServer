@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.UUID;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -23,8 +25,10 @@ public class User implements Serializable {
   private String displayName;
   private String password;
   @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
   private ActiveStatus status = ActiveStatus.ONLINE;
   private LocalDateTime createdDate;
+  @Enumerated(EnumType.STRING)
   private UserType type = UserType.USER;
 
   public User() {

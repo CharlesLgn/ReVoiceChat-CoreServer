@@ -4,6 +4,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -12,10 +14,13 @@ import jakarta.persistence.Table;
 public class MediaData {
   @Id
   private UUID id;
+  @Enumerated(EnumType.STRING)
   private FileType type;
+  @Enumerated(EnumType.STRING)
   private MediaOrigin origin;
   private String name;
   private String url;
+  @Enumerated(EnumType.STRING)
   private MediaDataStatus status;
 
   public UUID getId() {
