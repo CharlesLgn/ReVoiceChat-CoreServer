@@ -19,15 +19,10 @@ public class JwtService {
 
   public String get(final User user) {
     LOG.info("generate jwt token for user {}", user.getId());
-    try {
-      return Jwt.issuer(jwtIssuer)
-                .subject(user.getLogin())
-                .groups(user.getType().getRoles())
-                .expiresAt(System.currentTimeMillis() + 1000L * 3600 * 24 * jwtValidDay)
-                .sign();
-    } catch (Exception e) {
-      LOG.error("generate jwt token", e);
-      throw e;
-    }
+    return Jwt.issuer(jwtIssuer)
+              .subject(user.getLogin())
+              .groups(user.getType().getRoles())
+              .expiresAt(System.currentTimeMillis() + 1000L * 3600 * 24 * jwtValidDay)
+              .sign();
   }
 }

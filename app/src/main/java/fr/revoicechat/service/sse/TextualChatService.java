@@ -8,9 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.ws.rs.sse.Sse;
-import jakarta.ws.rs.sse.SseEventSink;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +16,9 @@ import fr.revoicechat.model.User;
 import fr.revoicechat.representation.message.MessageRepresentation;
 import fr.revoicechat.representation.sse.SseData;
 import fr.revoicechat.service.user.RoomUserFinder;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.sse.Sse;
+import jakarta.ws.rs.sse.SseEventSink;
 
 /**
  * Service that manages textual chat messages and real-time updates via Server-Sent Events (SSE).
@@ -64,8 +64,10 @@ public class TextualChatService {
     var holders = getProcessor(userId);
     var emitters = new HashSet<>(holders);
     for (SseHolder holder : emitters) {
+      LOG.debug("send message to user {}", userId);
       var sent = holder.send(new SseData(ROOM_MESSAGE, message));
       if (!sent) {
+        LOG.debug("sse closed for user {}", userId);
         holders.remove(holder);
       }
     }
@@ -76,6 +78,7 @@ public class TextualChatService {
   }
 
   private boolean ping(User user) {
+    LOG.debug("ping user {}", user.getId());
     return getProcessor(user.getId()).stream().anyMatch(holder -> holder.send(new SseData(PING)));
   }
 
