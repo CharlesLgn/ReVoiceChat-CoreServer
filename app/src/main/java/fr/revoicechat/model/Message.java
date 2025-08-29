@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -20,8 +20,7 @@ import jakarta.persistence.Table;
 public class Message {
   @Id
   private UUID id;
-  @Lob
-  @Column
+  @Column(columnDefinition = "TEXT")
   private String text;
   private LocalDateTime createdDate;
   @ManyToOne
