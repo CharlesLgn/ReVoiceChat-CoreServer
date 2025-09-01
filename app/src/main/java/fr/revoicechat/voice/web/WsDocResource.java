@@ -24,11 +24,12 @@ public class WsDocResource {
   @GET
   @Operation(summary = "WebSocket endpoint",
       description = """
-          Connect via `ws://localhost:8080/api/voice?token={jwtToken}`.
+          Connect via `ws://*url*/api/voice/{roomId}?token={jwtToken}`.
             - Text messages: JSON control
             - Binary messages: audio chunks
-          the param "token" is needed to know which user is connected""")
+          @param roomId: id of the room. it must be of type "VOICE"
+          @param token: needed to know which user is connected""")
   public Response wsInfo() {
-    return Response.ok(Map.of("url", "ws://localhost:8080/api/voice?token={jwtToken}")).build();
+    return Response.ok(Map.of("url", "ws://*url*/api/voice/{roomId}?token={jwtToken}")).build();
   }
 }

@@ -6,4 +6,4 @@ import fr.revoicechat.notification.model.NotificationPayload;
 import fr.revoicechat.notification.model.NotificationType;
 
 @NotificationType("VOICE_LEAVING")
-public record VoiceLeavingNotification(UUID userId) implements NotificationPayload {}
+public record VoiceLeavingNotification(UUID userId, UUID roomId) implements NotificationPayload {}

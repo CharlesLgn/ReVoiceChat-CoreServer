@@ -33,7 +33,7 @@ class TestNewServerCreator {
       Room room2 = (Room) em.saved.get(2);
       assertRoom(softly, room2, "Random", server, RoomType.TEXT);
       Room room3 = (Room) em.saved.get(3);
-      assertRoom(softly, room3, "Vocal", server, RoomType.WEBRTC);
+      assertRoom(softly, room3, "Vocal", server, RoomType.VOICE);
     }
   }
 
