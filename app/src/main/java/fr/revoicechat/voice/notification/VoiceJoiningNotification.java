@@ -6,4 +6,4 @@ import fr.revoicechat.notification.model.NotificationPayload;
 import fr.revoicechat.notification.model.NotificationType;
 
 @NotificationType("VOICE_JOINING")
-public record VoiceJoiningNotification(UUID userId) implements NotificationPayload {}
+public record VoiceJoiningNotification(UUID userId, UUID roomId) implements NotificationPayload {}
