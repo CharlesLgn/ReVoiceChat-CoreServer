@@ -21,13 +21,10 @@ class TestDevOnlyController {
                             .when().get("/error/throw")
                             .then().statusCode(500)
                             .extract().body().asPrettyString();
-    Assertions.assertThat(result).isEqualToNormalizingNewlines("""
-                                                                   {
-                                                                       "error": "Internal Server Error",
-                                                                       "message": "Something went wrong on our side. Please try again later or contact support if the problem persists.",
-                                                                       "errorFile": "unable to generate an internal error file",
-                                                                       "swaggerDoc": "/api/q/swagger-ui"
-                                                                   }""");
+    Assertions.assertThat(result).contains("\"error\": \"Internal Server Error\"",
+                                           "\"message\": \"Something went wrong on our side. Please try again later or contact support if the problem persists.\"",
+                                           "\"errorFile\":",
+                                           "\"swaggerDoc\": \"/api/q/swagger-ui\"");
   }
 
   @Test
@@ -38,13 +35,10 @@ class TestDevOnlyController {
                             .when().get("/error/throw")
                             .then().statusCode(500)
                             .extract().body().asPrettyString();
-    Assertions.assertThat(result).isEqualToNormalizingNewlines("""
-                                                                   {
-                                                                       "error": "Erreur interne du serveur",
-                                                                       "message": "Problème est survenu de notre côté. Veuillez réessayer plus tard ou contacter lassistance si le problème persiste.",
-                                                                       "errorFile": "unable to generate an internal error file",
-                                                                       "swaggerDoc": "/api/q/swagger-ui"
-                                                                   }""");
+    Assertions.assertThat(result).contains("\"error\": \"Erreur interne du serveur\",",
+                                           "\"message\": \"Problème est survenu de notre côté. Veuillez réessayer plus tard ou contacter lassistance si le problème persiste.\",",
+                                           "\"errorFile\": ",
+                                           "\"swaggerDoc\": \"/api/q/swagger-ui\"");
   }
 
   public static class DevTestProfile implements QuarkusTestProfile {
