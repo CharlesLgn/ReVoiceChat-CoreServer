@@ -1,0 +1,131 @@
+package fr.revoicechat.core.web;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import jakarta.ws.rs.core.MediaType;
+
+import org.junit.jupiter.api.Test;
+
+import fr.revoicechat.core.junit.CleanDatabase;
+import fr.revoicechat.core.model.FileType;
+import fr.revoicechat.core.model.Room;
+import fr.revoicechat.core.model.RoomType;
+import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
+import fr.revoicechat.core.repository.page.PageResult;
+import fr.revoicechat.core.representation.message.CreatedMessageRepresentation;
+import fr.revoicechat.core.representation.message.CreatedMessageRepresentation.CreatedMediaDataRepresentation;
+import fr.revoicechat.core.representation.message.MessageRepresentation;
+import fr.revoicechat.core.representation.room.RoomRepresentation;
+import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
+import fr.revoicechat.core.representation.server.ServerRepresentation;
+import fr.revoicechat.core.web.tests.RestTestUtils;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
+import io.restassured.RestAssured;
+
+@QuarkusTest
+@CleanDatabase
+@TestProfile(MultiServerProfile.class)
+class TestMessageController {
+
+  @Test
+  void testGetMessage() {
+    String token = RestTestUtils.logNewUser();
+    var server = createServer(token);
+    var room = createRoom(token, server);
+    var messageId = createMessage(token, room).id();
+    var message = RestAssured.given()
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .header("Authorization", "Bearer " + token)
+                             .when().pathParam("id", messageId).get("/message/{id}")
+                             .then().statusCode(200)
+                             .extract().body().as(MessageRepresentation.class);
+    assertThat(message.text()).isEqualTo("message 1");
+    assertThat(message.user()).isNotNull();
+    assertThat(message.medias()).hasSize(1);
+    var media = message.medias().getFirst();
+    assertThat(media.name()).isEqualTo("test.png");
+    assertThat(media.type()).isEqualTo(FileType.PICTURE);
+  }
+
+  @Test
+  void testUpdateMessage() {
+    String token = RestTestUtils.logNewUser();
+    var server = createServer(token);
+    var room = createRoom(token, server);
+    var message = createMessage(token, room);
+    PageResult<MessageRepresentation> page1 = getPage(token, room);
+    assertThat(page1.content()).hasSize(1).map(MessageRepresentation::text).containsExactly("message 1");
+    RestAssured.given()
+               .contentType(MediaType.APPLICATION_JSON)
+               .header("Authorization", "Bearer " + token)
+               .body(new CreatedMessageRepresentation("message 2", List.of()))
+               .when().pathParam("id", message.id()).patch("/message/{id}")
+               .then().statusCode(200);
+    PageResult<MessageRepresentation> page2 = getPage(token, room);
+    assertThat(page2.content()).hasSize(1).map(MessageRepresentation::text).containsExactly("message 2");
+  }
+
+  @Test
+  void testDeleteMessage() {
+    String token = RestTestUtils.logNewUser();
+    var server = createServer(token);
+    var room = createRoom(token, server);
+    var message = createMessage(token, room);
+    PageResult<MessageRepresentation> page1 = getPage(token, room);
+    assertThat(page1.content()).hasSize(1);
+    RestAssured.given()
+               .contentType(MediaType.APPLICATION_JSON)
+               .header("Authorization", "Bearer " + token)
+               .when().pathParam("id", message.id()).delete("/message/{id}")
+               .then().statusCode(200);
+    PageResult<MessageRepresentation> page3 = getPage(token, room);
+    assertThat(page3.content()).isEmpty();
+  }
+
+  private static PageResult<MessageRepresentation> getPage(final String token, final Room room) {
+    var body = RestAssured.given()
+                          .contentType(MediaType.APPLICATION_JSON)
+                          .header("Authorization", "Bearer " + token)
+                          .when()
+                          .pathParam("id", room.getId()).get("/room/{id}/message")
+                          .then().statusCode(200)
+                          .extract().body();
+    var pageResult = body.as(PageResult.class);
+    var messages = body.jsonPath().getList("content", MessageRepresentation.class);
+    return new PageResult<>(messages, pageResult.pageNumber(), pageResult.pageSize(), pageResult.totalElements());
+  }
+
+  private static MessageRepresentation createMessage(final String token, final Room room) {
+    return RestAssured.given()
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .header("Authorization", "Bearer " + token)
+                      .body(new CreatedMessageRepresentation("message 1", List.of(new CreatedMediaDataRepresentation("test.png"))))
+                      .when().pathParam("id", room.getId()).put("/room/{id}/message")
+                      .then().statusCode(200)
+                      .extract().body().as(MessageRepresentation.class);
+  }
+
+  private static Room createRoom(final String token, final ServerRepresentation server) {
+    RoomRepresentation representation = new RoomRepresentation("test", RoomType.TEXT);
+    return RestAssured.given()
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .header("Authorization", "Bearer " + token)
+                      .body(representation)
+                      .when().pathParam("id", server.id()).put("/server/{id}/room")
+                      .then().statusCode(200)
+                      .extract().body().as(Room.class);
+  }
+
+  private static ServerRepresentation createServer(String token) {
+    var representation = new ServerCreationRepresentation("test");
+    return RestAssured.given()
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .header("Authorization", "Bearer " + token)
+                      .body(representation)
+                      .when().put("/server")
+                      .then().statusCode(200)
+                      .extract().as(ServerRepresentation.class);
+  }
+}

@@ -1,10 +1,9 @@
 package fr.revoicechat.core.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
@@ -17,12 +16,11 @@ import fr.revoicechat.core.model.RoomType;
 import fr.revoicechat.core.model.Server;
 import fr.revoicechat.core.nls.CommonErrorCode;
 import fr.revoicechat.core.nls.ServerErrorCode;
-import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
+import fr.revoicechat.core.quarkus.profile.MonoServerProfile;
 import fr.revoicechat.core.representation.room.RoomRepresentation;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.representation.user.UserRepresentation;
-import fr.revoicechat.core.web.TestMonoServerController.MonoServerProfile;
 import fr.revoicechat.core.web.tests.RestTestUtils;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -115,6 +113,17 @@ class TestMonoServerController {
   }
 
   @Test
+  void testDeleteServer() {
+    String token = RestTestUtils.logNewUser();
+    var servers = getServers(token);
+    RestAssured.given()
+               .contentType(MediaType.APPLICATION_JSON)
+               .header("Authorization", "Bearer " + token)
+               .when().pathParam("id", servers.getFirst().id()).delete("/server/{id}")
+               .then().statusCode(400).body(is(ServerErrorCode.APPLICATION_DOES_NOT_ALLOW_SERVER_DELETION.translate()));
+  }
+
+  @Test
   void fetchUser() {
     RestTestUtils.signup("Nyphew", "a");
     String token = RestTestUtils.logNewUser();
@@ -151,14 +160,5 @@ class TestMonoServerController {
                       .extract()
                       .body()
                       .jsonPath().getList(".", Room.class);
-  }
-
-  public static class MonoServerProfile extends BasicIntegrationTestProfile {
-    @Override
-    public Map<String, String> getConfigOverrides() {
-      var config = new HashMap<>(super.getConfigOverrides());
-      config.put("revoicechat.global.sever-mode", "MONO_SERVER");
-      return config;
-    }
   }
 }

@@ -22,7 +22,7 @@ class TestMultiServerProviderService {
   @Test
   void testCanBeUsed() {
     var service = new MultiServerProviderService(null, null, null, null);
-    assertThatCode(service::canBeUsed).doesNotThrowAnyException();
+    assertThatCode(service::init).doesNotThrowAnyException();
   }
 
   private record ServerRepositoryMock(long count, List<Server> findAll) implements ServerRepository {}

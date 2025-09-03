@@ -1,8 +1,11 @@
 package fr.revoicechat.core.service.server;
 
+import static fr.revoicechat.core.config.SeverAppMode.MULTI_SERVER;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import org.slf4j.Logger;
@@ -20,7 +23,7 @@ import io.quarkus.arc.properties.IfBuildProperty;
  * In this mode, any number of {@link Server} instances may exist in the system.
  */
 @ApplicationScoped
-@IfBuildProperty(name = "revoicechat.global.sever-mode", stringValue = "MULTI_SERVER")
+@IfBuildProperty(name = "revoicechat.global.sever-mode", stringValue = MULTI_SERVER)
 public class MultiServerProviderService implements ServerProviderService {
   private static final Logger LOG = LoggerFactory.getLogger(MultiServerProviderService.class);
 
@@ -39,9 +42,8 @@ public class MultiServerProviderService implements ServerProviderService {
     this.serverDeleterService = serverDeleterService;
   }
 
-  /** This implementation always allows usage. */
-  @Override
-  public void canBeUsed() {
+  @PostConstruct
+  public void init() {
     LOG.info("Multi server mode : enabled");
   }
 

@@ -5,14 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -29,7 +28,7 @@ public class Message {
   @ManyToOne
   @JoinColumn(name="USER_ID", nullable=false)
   private User user;
-  @OneToMany
+  @ManyToMany
   @JoinTable(name = "RVC_MEASSAGE_MEDIA",
       joinColumns = @JoinColumn(name = "MEASSAGE_ID", referencedColumnName = "ID"),
       inverseJoinColumns = @JoinColumn(name = "MEDIA_ID", referencedColumnName = "ID"))
@@ -80,7 +79,10 @@ public class Message {
   }
 
   public List<MediaData> getMediaDatas() {
-    return Objects.requireNonNullElseGet(mediaDatas, ArrayList::new);
+    if (this.mediaDatas == null) {
+      this.mediaDatas = new ArrayList<>();
+    }
+    return this.mediaDatas;
   }
 
   public void setMediaDatas(final List<MediaData> mediaData) {
@@ -88,10 +90,10 @@ public class Message {
   }
 
   public void addMediaData(final MediaData mediaData) {
-    if (getMediaDatas() == null) {
-      setMediaDatas(new ArrayList<>());
+    if (this.mediaDatas == null) {
+      this.mediaDatas = new ArrayList<>();
     }
-    getMediaDatas().add(mediaData);
+    mediaDatas.add(mediaData);
   }
 
   @Override

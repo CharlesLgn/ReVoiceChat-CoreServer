@@ -50,17 +50,33 @@ public class ServerUser {
       return false;
     }
     final ServerUser that = (ServerUser) o;
-    return Objects.equals(user, that.user) && Objects.equals(server, that.server);
+    return Objects.equals(getUser(), that.getUser()) && Objects.equals(getServer(), that.getServer());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(user, server);
+    return Objects.hash(getUser(), getServer());
   }
 
   public static class ServerUserId implements Serializable {
     private UUID user;
     private UUID server;
+
+    public UUID getUser() {
+      return user;
+    }
+
+    public void setUser(final UUID user) {
+      this.user = user;
+    }
+
+    public UUID getServer() {
+      return server;
+    }
+
+    public void setServer(final UUID server) {
+      this.server = server;
+    }
 
     @Override
     public boolean equals(final Object o) {
@@ -68,12 +84,12 @@ public class ServerUser {
         return false;
       }
       final ServerUserId that = (ServerUserId) o;
-      return Objects.equals(user, that.user) && Objects.equals(server, that.server);
+      return Objects.equals(getUser(), that.getUser()) && Objects.equals(getServer(), that.getServer());
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(user, server);
+      return Objects.hash(getUser(), getServer());
     }
   }
 }

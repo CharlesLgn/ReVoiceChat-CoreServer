@@ -1,16 +1,26 @@
 package fr.revoicechat.core.dev;
 
-import io.quarkus.arc.profile.IfBuildProfile;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 
-@Path("/error/throw")
+import io.quarkus.arc.profile.IfBuildProfile;
+
+@Path("/tests")
 @IfBuildProfile("dev")
 public class DevOnlyController {
 
   @GET
+  @RolesAllowed("USER")
+  @Path(("/secured-endpoint"))
+  public String securedEndpoint() {
+    return "secured-endpoint";
+  }
+
+  @GET
   @PermitAll
+  @Path(("/error/throw"))
   public String error() {
     throw new UnsupportedOperationException("this method is here to test error log generation");
   }

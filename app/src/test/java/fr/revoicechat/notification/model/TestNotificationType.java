@@ -33,13 +33,13 @@ class TestNotificationType {
     Map<String, Class<?>> seen = new HashMap<>();
     for (Class<?> clazz : payloads) {
       NotificationType ann = clazz.getAnnotation(NotificationType.class);
-      if (seen.containsKey(ann.value())) {
+      if (seen.containsKey(ann.name())) {
         fail("""
             Duplicate @NotificationType value "%s" for classes:
               - %s
-              - %s""".formatted(ann.value(), clazz.getName(), seen.get(ann.value()).getName()));
+              - %s""".formatted(ann.name(), clazz.getName(), seen.get(ann.name()).getName()));
       }
-      seen.put(ann.value(), clazz);
+      seen.put(ann.name(), clazz);
     }
     seen.forEach((value, clazz) -> LOG.info("type \"{}\" for class \"{}\"", value, clazz.getName()));
   }

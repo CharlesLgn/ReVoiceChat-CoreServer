@@ -1,8 +1,11 @@
 package fr.revoicechat.core.service.server;
 
+import static fr.revoicechat.core.config.SeverAppMode.MONO_SERVER;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -24,7 +27,7 @@ import io.quarkus.arc.properties.IfBuildProperty;
  * If no server is found, a new one is automatically created.
  */
 @ApplicationScoped
-@IfBuildProperty(name = "revoicechat.global.sever-mode", stringValue = "MONO_SERVER")
+@IfBuildProperty(name = "revoicechat.global.sever-mode", stringValue = MONO_SERVER)
 public class MonoServerProviderService implements ServerProviderService {
   private static final Logger LOG = LoggerFactory.getLogger(MonoServerProviderService.class);
 
@@ -48,8 +51,8 @@ public class MonoServerProviderService implements ServerProviderService {
    * This method throws an exception if more than one server exists.
    * @throws IllegalStateException if more than one server exists
    */
-  @Override
-  public void canBeUsed() {
+  @PostConstruct
+  public void init() {
     if (serverRepository.count() > 1) {
       LOG.error("Mono server mode : error");
       throw new IllegalStateException(ERROR_MESSAGE);

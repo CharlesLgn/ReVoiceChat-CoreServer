@@ -14,8 +14,12 @@ public class RestTestUtils {
   private static final AtomicInteger counter = new AtomicInteger(1);
 
   public static String logNewUser() {
-    RestTestUtils.signup("user", "psw");
-    return RestTestUtils.login("user", "psw");
+    return logNewUser("user");
+  }
+
+  public static String logNewUser(String user) {
+    RestTestUtils.signup(user, "psw");
+    return RestTestUtils.login(user, "psw");
   }
 
   public static UserRepresentation signup(String user, String password) {

@@ -2,7 +2,6 @@ package fr.revoicechat.core.model;
 
 import java.util.Objects;
 import java.util.UUID;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,7 +18,6 @@ public class MediaData {
   @Enumerated(EnumType.STRING)
   private MediaOrigin origin;
   private String name;
-  private String url;
   @Enumerated(EnumType.STRING)
   private MediaDataStatus status;
 
@@ -53,14 +51,6 @@ public class MediaData {
 
   public void setName(final String name) {
     this.name = name;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(final String url) {
-    this.url = url;
   }
 
   public MediaDataStatus getStatus() {

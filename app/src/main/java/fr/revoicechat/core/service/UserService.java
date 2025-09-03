@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import fr.revoicechat.core.config.RevoiceChatGlobalConfig;
 import fr.revoicechat.core.error.BadRequestException;
 import fr.revoicechat.core.model.ActiveStatus;
 import fr.revoicechat.core.model.InvitationLink;
@@ -34,6 +33,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 @ApplicationScoped
 public class UserService {
 
@@ -41,18 +42,17 @@ public class UserService {
   private final UserRepository userRepository;
   private final UserHolder userHolder;
   private final ServerProviderService serverProviderService;
-  private final RevoiceChatGlobalConfig globalConfig;
+  @ConfigProperty(name = "revoicechat.global.app-only-accessible-by-invitation")
+  boolean appOnlyAccessibleByInvitation;
 
   public UserService(EntityManager entityManager,
                      UserRepository userRepository,
                      UserHolder userHolder,
-                     ServerProviderService serverProviderService,
-                     RevoiceChatGlobalConfig globalConfig) {
+                     ServerProviderService serverProviderService) {
     this.entityManager = entityManager;
     this.userRepository = userRepository;
     this.userHolder = userHolder;
     this.serverProviderService = serverProviderService;
-    this.globalConfig = globalConfig;
   }
 
   @Transactional
@@ -63,7 +63,7 @@ public class UserService {
     var invitationLink = Optional.ofNullable(signer.invitationLink())
                                  .map(id -> entityManager.find(InvitationLink.class, id))
                                  .orElse(null);
-    if (globalConfig.isAppOnlyAccessibleByInvitation() && !isValideInvitation(invitationLink)) {
+    if (appOnlyAccessibleByInvitation && !isValideInvitation(invitationLink)) {
       throw new BadRequestException(USER_WITH_NO_VALID_INVITATION);
     }
     return generateUser(signer, invitationLink, UserType.USER);
@@ -134,7 +134,7 @@ public class UserService {
   }
 
   private void setPassword(final User user, final PasswordUpdated password) {
-    if (PasswordUtils.matches(password.password(), user.getPassword())) {
+    if (!PasswordUtils.matches(password.password(), user.getPassword())) {
       throw new BadRequestException(USER_PASSWORD_WRONG);
     }
     if (Objects.equals(password.newPassword(), password.confirmPassword())) {

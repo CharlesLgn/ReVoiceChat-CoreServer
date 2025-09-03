@@ -2,7 +2,7 @@ package fr.revoicechat.core.web.error;
 
 import static fr.revoicechat.core.nls.HttpStatusErrorCode.*;
 
-import java.io.IOException;
+import java.io.IOError;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -19,12 +19,13 @@ final class ErrorMapperUtils {
   static final String UNKNOWN_JSON_MESSAGE = fetchForbiddenAccessFile("/static/unknown-error-template.json");
   static final String UNKNOWN_HTML_MESSAGE = fetchForbiddenAccessFile("/static/unknown-error-template.html");
 
-  private static String fetchForbiddenAccessFile(String name) {
+  @SuppressWarnings("java:S1181") // generate an IOError for any throwable
+  static String fetchForbiddenAccessFile(String name) {
     try (var ressource = ErrorMapperUtils.class.getResourceAsStream(name)) {
       assert ressource != null;
       return new String(ressource.readAllBytes(), StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      throw new IllegalArgumentException(e);
+    } catch (Throwable e) {
+      throw new IOError(e);
     }
   }
 

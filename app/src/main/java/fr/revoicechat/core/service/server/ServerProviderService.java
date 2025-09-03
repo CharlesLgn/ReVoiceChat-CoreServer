@@ -26,15 +26,6 @@ public interface ServerProviderService {
    *
    * @throws IllegalStateException if the mode cannot be used
    */
-  void canBeUsed();
-
-  /**
-   * Checks whether this provider mode can be used in the current application state.
-   * <p>
-   * Implementations may throw an exception if the mode is incompatible with the existing server configuration.
-   *
-   * @throws IllegalStateException if the mode cannot be used
-   */
   List<Server> getServers();
 
   Stream<User> getUsers(UUID id);
