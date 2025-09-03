@@ -94,5 +94,6 @@ public interface RoomController extends LoggedApi {
       )
   )
   @PUT
-  @Path("/message") MessageRepresentation sendMessage(@PathParam("id") UUID roomId, CreatedMessageRepresentation representation);
+  @Path("/message")
+  MessageRepresentation sendMessage(@PathParam("id") UUID roomId, CreatedMessageRepresentation representation);
 }

@@ -4,6 +4,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.UUID;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import fr.revoicechat.core.error.ResourceNotFoundException;
 import fr.revoicechat.core.model.Message;
@@ -19,9 +24,6 @@ import fr.revoicechat.core.service.media.MediaDataService;
 import fr.revoicechat.core.service.message.MessageValidation;
 import fr.revoicechat.core.service.user.RoomUserFinder;
 import fr.revoicechat.notification.Notification;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 /**
  * Service layer for managing chat messages within rooms.
@@ -50,6 +52,8 @@ import jakarta.transaction.Transactional;
 @ApplicationScoped
 public class MessageService {
 
+  @ConfigProperty(name = "revoicechat.global.media-server-url")
+  String mediaServerUrl;
   private final EntityManager entityManager;
   private final MessageRepository messageRepository;
   private final RoomService roomService;
@@ -122,6 +126,7 @@ public class MessageService {
    * @return a representation of the message
    * @throws ResourceNotFoundException if the message does not exist
    */
+  @Transactional
   public MessageRepresentation read(UUID id) {
     var message = getMessage(id);
     return toRepresantation(message, null);
@@ -183,7 +188,7 @@ public class MessageService {
                .map(media -> new MediaDataRepresentation(
                    media.getId(),
                    media.getName(),
-                   media.getUrl(),
+                   mediaServerUrl + "/" + media.getName(),
                    media.getOrigin(),
                    media.getType()
                )).toList()

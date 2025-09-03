@@ -63,7 +63,7 @@ class TestMonoServerProviderService {
     ServerRepository serverRepository = new ServerRepositoryMock(numberOfServer, List.of());
     MonoServerProviderService serverProviderService = new MonoServerProviderService(serverRepository, newServerCreator, null);
     // When - Then
-    assertThatCode(serverProviderService::canBeUsed).doesNotThrowAnyException();
+    assertThatCode(serverProviderService::init).doesNotThrowAnyException();
   }
 
   @ParameterizedTest
@@ -74,7 +74,7 @@ class TestMonoServerProviderService {
     ServerRepository serverRepository = new ServerRepositoryMock(numberOfServer, List.of());
     MonoServerProviderService serverProviderService = new MonoServerProviderService(serverRepository, newServerCreator, null);
     // When - Then
-    assertThatThrownBy(serverProviderService::canBeUsed)
+    assertThatThrownBy(serverProviderService::init)
         .isInstanceOf(IllegalStateException.class)
         .hasMessage(ERROR_MESSAGE);
   }

@@ -19,7 +19,6 @@ import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
-import jakarta.ws.rs.WebApplicationException;
 
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.slf4j.Logger;
@@ -60,22 +59,22 @@ public class ChatWebSocket {
       closeSession(session, CloseCodes.VIOLATED_POLICY, "Missing token");
       return;
     }
-    try {
       executor.submit(() -> {
-        var user = userHolder.get(token);
-        closeOldSession(user);
-        var room = entityManager.find(Room.class, roomId);
-        if (room == null || !room.getType().equals(RoomType.VOICE)) {
-          closeSession(session, CloseCodes.CANNOT_ACCEPT, "selected room cannot accept websocket chat type");
-          return;
+        try {
+          var user = userHolder.get(token);
+          closeOldSession(user);
+          var room = entityManager.find(Room.class, roomId);
+          if (room == null || !room.getType().equals(RoomType.VOICE)) {
+            closeSession(session, CloseCodes.CANNOT_ACCEPT, "selected room cannot accept websocket chat type");
+            return;
+          }
+          LOG.info("WebSocket connected as user {}", user.getId());
+          sessions.add(new UserSession(user.getId(), roomId, session));
+          Notification.of(new VoiceJoiningNotification(user.getId(), roomId)).sendTo(Stream.of(user));
+        } catch (Exception e) {
+          closeSession(session, CloseCodes.VIOLATED_POLICY, "Invalid token: " + e.getMessage());
         }
-        LOG.info("WebSocket connected as user {}", user.getId());
-        sessions.add(new UserSession(user.getId(), roomId, session));
-        Notification.of(new VoiceJoiningNotification(user.getId(), roomId)).sendTo(Stream.of(user));
       });
-    } catch (WebApplicationException e) {
-      closeSession(session, CloseCodes.VIOLATED_POLICY, "Invalid token: " + e.getMessage());
-    }
   }
 
   private String token(Session session) {

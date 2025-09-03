@@ -158,7 +158,12 @@ class TestGlobalExceptionMapper {
 
   @Test
   void testNotFoundExceptionHTML() {
-    mapper.headers = null;
+    mapper.headers = new HttpHeadersMock() {
+      @Override
+      public List<MediaType> getAcceptableMediaTypes() {
+        return List.of(MediaType.TEXT_XML_TYPE);
+      }
+    };
     var ex = new NotFoundException();
     var response = mapper.toResponse(ex);
     assertThat(response).isNotNull();

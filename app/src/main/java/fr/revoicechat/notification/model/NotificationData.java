@@ -11,6 +11,8 @@ public record NotificationData(NotificationPayload data) implements Serializable
     return new NotificationData(new Ping());
   }
 
-  @NotificationType("PING")
-  record Ping() implements NotificationPayload {}
+  @NotificationType(name = "PING")
+  public static final class Ping implements NotificationPayload {
+    public Ping() {super();}
+  }
 }

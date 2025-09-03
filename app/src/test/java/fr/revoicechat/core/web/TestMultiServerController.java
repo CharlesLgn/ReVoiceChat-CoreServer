@@ -3,20 +3,17 @@ package fr.revoicechat.core.web;
 import static fr.revoicechat.core.web.tests.RestTestUtils.signup;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import jakarta.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.junit.CleanDatabase;
-import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
+import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.representation.user.UserRepresentation;
-import fr.revoicechat.core.web.TestMultiServerController.MultiServerProfile;
 import fr.revoicechat.core.web.tests.RestTestUtils;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -137,14 +134,5 @@ class TestMultiServerController {
                       .then().statusCode(200)
                       .extract()
                       .body().jsonPath().getList(".", ServerRepresentation.class);
-  }
-
-  public static class MultiServerProfile extends BasicIntegrationTestProfile {
-    @Override
-    public Map<String, String> getConfigOverrides() {
-      var config = new HashMap<>(super.getConfigOverrides());
-      config.put("revoicechat.global.sever-mode", "MULTI_SERVER");
-      return config;
-    }
   }
 }

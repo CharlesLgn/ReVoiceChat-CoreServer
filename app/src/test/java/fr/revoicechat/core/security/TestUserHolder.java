@@ -1,0 +1,74 @@
+package fr.revoicechat.core.security;
+
+import java.util.UUID;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
+
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import fr.revoicechat.core.junit.CleanDatabase;
+import fr.revoicechat.core.model.User;
+import fr.revoicechat.core.model.UserType;
+import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
+import fr.revoicechat.core.security.jwt.JwtService;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
+import io.quarkus.test.security.TestSecurity;
+
+@QuarkusTest
+@CleanDatabase
+@TestProfile(BasicIntegrationTestProfile.class)
+class TestUserHolder {
+
+  @Inject UserHolder userHolder;
+  @Inject EntityManager entityManager;
+  @Inject JwtService jwtService;
+
+  @Test
+  @TestSecurity(user = "test-user")
+  void testWithNoUserInDb() {
+    Assertions.assertThatThrownBy(userHolder::get).isInstanceOf(NotFoundException.class);
+  }
+
+  @Test
+  @Transactional
+  @TestSecurity(user = "test-user")
+  void testWithUserInDb() {
+    User user = new User();
+    user.setId(UUID.randomUUID());
+    user.setLogin("test-user");
+    user.setDisplayName("test-user");
+    user.setType(UserType.USER);
+    entityManager.persist(user);
+    Assertions.assertThat(userHolder.get()).isNotNull();
+  }
+
+  @Test
+  @Transactional
+  void testWithToken() {
+    User user = new User();
+    user.setId(UUID.randomUUID());
+    user.setLogin("test-user");
+    user.setDisplayName("test-user");
+    user.setType(UserType.USER);
+    entityManager.persist(user);
+    var token = jwtService.get(user);
+    Assertions.assertThat(userHolder.get(token)).isNotNull();
+  }
+
+  @Test
+  @Transactional
+  void testWithTokenAndNoUserInDb() {
+    User user = new User();
+    user.setId(UUID.randomUUID());
+    user.setLogin("test-user");
+    user.setDisplayName("test-user");
+    user.setType(UserType.USER);
+    var token = jwtService.get(user);
+    Assertions.assertThatThrownBy(() -> userHolder.get(token)).isInstanceOf(WebApplicationException.class);
+  }
+}

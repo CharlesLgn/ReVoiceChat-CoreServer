@@ -18,7 +18,7 @@ class TestDevOnlyController {
   @Test
   void testError() {
     var result = RestAssured.given().contentType(MediaType.APPLICATION_JSON)
-                            .when().get("/error/throw")
+                            .when().get("/tests/error/throw")
                             .then().statusCode(500)
                             .extract().body().asPrettyString();
     Assertions.assertThat(result).contains("\"error\": \"Internal Server Error\"",
@@ -32,7 +32,7 @@ class TestDevOnlyController {
     var result = RestAssured.given()
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Accept-Language", "fr")
-                            .when().get("/error/throw")
+                            .when().get("/tests/error/throw")
                             .then().statusCode(500)
                             .extract().body().asPrettyString();
     Assertions.assertThat(result).contains("\"error\": \"Erreur interne du serveur\",",
