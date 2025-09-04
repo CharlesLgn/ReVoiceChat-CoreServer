@@ -12,6 +12,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.sse.InboundSseEvent;
 import jakarta.ws.rs.sse.SseEventSource;
 
@@ -20,12 +21,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.revoicechat.core.junit.CleanDatabase;
+import fr.revoicechat.core.model.ActiveStatus;
 import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
+import fr.revoicechat.core.representation.user.UserRepresentation;
 import fr.revoicechat.core.web.tests.RestTestUtils;
 import fr.revoicechat.notification.Notification;
 import fr.revoicechat.notification.service.NotificationService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
+import io.restassured.RestAssured;
 
 @QuarkusTest
 @TestProfile(BasicIntegrationTestProfile.class)
@@ -49,6 +53,14 @@ class TestNotificationController {
       Notification.ping(user::id);
       await().during(1, SECONDS);
       assertThat(events).containsExactly("{\"type\":\"PING\",\"data\":{}}");
+      var retrievedUser = RestAssured.given()
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .header("Authorization", "Bearer " + token)
+                                     .when().get("/user/me")
+                                     .then().statusCode(200)
+                                     .extract().body().as(UserRepresentation.class);
+      assertThat(retrievedUser).isNotNull();
+      assertThat(retrievedUser.status()).isEqualTo(ActiveStatus.ONLINE);
     }
   }
 

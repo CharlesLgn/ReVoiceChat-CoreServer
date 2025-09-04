@@ -13,7 +13,7 @@ import io.quarkus.test.junit.QuarkusTest;
 class TestUserRole {
 
   @Test
-  @SuppressWarnings({"java:S5838", "java:S5863"})
+  @SuppressWarnings({ "java:S5838", "java:S5863" })
   void test() {
     var id1 = UUID.randomUUID();
     var user1 = user(id1);
@@ -47,6 +47,10 @@ class TestUserRole {
                      .isNotEqualTo(role9)
                      .isNotEqualTo(null)
                      .isNotEqualTo(new Object());
+    assertThat(role1.getPk()).isEqualTo(role1.getPk())
+                             .isNotEqualTo(null)
+                             .isNotEqualTo(new Object());
+
   }
 
   private static User user(final UUID id1) {
