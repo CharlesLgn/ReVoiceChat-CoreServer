@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.revoicechat.notification.stub.NotificationPayloadMock;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestNotificationData {
 
   @Test

@@ -1,5 +1,6 @@
 package fr.revoicechat.core.nls;
 
+@DoNotAddInTestList
 public enum LocalizedMessageTestEnum implements LocalizedMessage {
   TEST_IN_ENGLISH_ONLY,
   TEST_IN_FRENCH_ONLY,

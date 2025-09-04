@@ -18,12 +18,12 @@ import fr.revoicechat.core.representation.message.CreatedMessageRepresentation;
 import fr.revoicechat.core.representation.message.MediaDataRepresentation;
 import fr.revoicechat.core.representation.message.MessageRepresentation;
 import fr.revoicechat.core.representation.message.MessageRepresentation.ActionType;
-import fr.revoicechat.core.representation.message.MessageRepresentation.UserMessageRepresentation;
 import fr.revoicechat.core.security.UserHolder;
 import fr.revoicechat.core.service.media.MediaDataService;
 import fr.revoicechat.core.service.message.MessageValidation;
 import fr.revoicechat.core.service.user.RoomUserFinder;
 import fr.revoicechat.notification.Notification;
+import fr.revoicechat.notification.representation.UserNotificationRepresentation;
 
 /**
  * Service layer for managing chat messages within rooms.
@@ -178,10 +178,7 @@ public class MessageService {
         message.getId(),
         message.getText(),
         message.getRoom().getId(),
-        new UserMessageRepresentation(
-            message.getUser().getId(),
-            message.getUser().getDisplayName()
-        ),
+        new UserNotificationRepresentation(message.getUser().getId(), message.getUser().getDisplayName()),
         message.getCreatedDate().atOffset(ZoneOffset.UTC),
         actionType,
         message.getMediaDatas().stream()

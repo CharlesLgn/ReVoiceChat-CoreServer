@@ -4,19 +4,22 @@ import java.util.UUID;
 
 import fr.revoicechat.notification.model.NotificationPayload;
 import fr.revoicechat.notification.model.NotificationType;
+import fr.revoicechat.notification.representation.UserNotificationRepresentation;
 
 @NotificationType(name = "VOICE_JOINING")
 public class VoiceJoiningNotification implements NotificationPayload {
-  private final UUID userId;
+  private final UserNotificationRepresentation user;
   private final UUID roomId;
 
-  public VoiceJoiningNotification(UUID userId, UUID roomId) {
-    this.userId = userId;
+  public VoiceJoiningNotification(UserNotificationRepresentation user, UUID roomId) {
+    this.user = user;
     this.roomId = roomId;
   }
 
   @SuppressWarnings("unused") // call by reflection
-  public UUID getUserId() {return userId;}
+  public UserNotificationRepresentation getUser() {
+    return user;
+  }
 
   @SuppressWarnings("unused") // call by reflection
   public UUID getRoomId() {return roomId;}

@@ -29,6 +29,7 @@ import fr.revoicechat.core.model.RoomType;
 import fr.revoicechat.core.model.User;
 import fr.revoicechat.core.security.UserHolder;
 import fr.revoicechat.notification.Notification;
+import fr.revoicechat.notification.representation.UserNotificationRepresentation;
 import fr.revoicechat.voice.notification.VoiceJoiningNotification;
 import fr.revoicechat.voice.notification.VoiceLeavingNotification;
 
@@ -70,7 +71,7 @@ public class ChatWebSocket {
           }
           LOG.info("WebSocket connected as user {}", user.getId());
           sessions.add(new UserSession(user.getId(), roomId, session));
-          Notification.of(new VoiceJoiningNotification(user.getId(), roomId)).sendTo(Stream.of(user));
+          Notification.of(new VoiceJoiningNotification(new UserNotificationRepresentation(user.getId(), user.getDisplayName()), roomId)).sendTo(Stream.of(user));
         } catch (Exception e) {
           closeSession(session, CloseCodes.VIOLATED_POLICY, "Invalid token: " + e.getMessage());
         }

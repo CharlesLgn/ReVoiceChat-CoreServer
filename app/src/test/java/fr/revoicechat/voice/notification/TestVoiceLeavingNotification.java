@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.revoicechat.notification.model.NotificationData;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestVoiceLeavingNotification {
 
   @Test

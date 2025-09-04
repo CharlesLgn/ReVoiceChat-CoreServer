@@ -7,7 +7,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.model.ServerUser.ServerUserId;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestServerUser {
 
   @Test

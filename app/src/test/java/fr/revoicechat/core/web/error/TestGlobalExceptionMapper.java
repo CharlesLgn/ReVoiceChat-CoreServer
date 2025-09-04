@@ -23,7 +23,9 @@ import fr.revoicechat.core.nls.LocalizedMessageTestEnum;
 import fr.revoicechat.core.stub.HttpHeadersMock;
 import io.quarkus.security.ForbiddenException;
 import io.quarkus.security.UnauthorizedException;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestGlobalExceptionMapper {
 
   private GlobalExceptionMapper mapper;

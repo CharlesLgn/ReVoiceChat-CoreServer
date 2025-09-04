@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.repository.impl.UserRepositoryImpl;
 import fr.revoicechat.core.stub.EntityManagerMock;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestGenerateFictiveUsers {
 
   @Test
