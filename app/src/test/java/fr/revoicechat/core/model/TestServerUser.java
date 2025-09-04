@@ -68,10 +68,18 @@ class TestServerUser {
     var su3 = new ServerUserId();
     su3.setServer(UUID.randomUUID());
     su3.setUser(UUID.randomUUID());
+    var su4 = new ServerUserId();
+    su4.setServer(id1);
+    su4.setUser(UUID.randomUUID());
+    var su5 = new ServerUserId();
+    su5.setServer(UUID.randomUUID());
+    su5.setUser(id1);
     assertThat(su1).isEqualTo(su1)
                    .isEqualTo(su2)
                    .hasSameHashCodeAs(su2)
                    .isNotEqualTo(su3)
+                   .isNotEqualTo(su4)
+                   .isNotEqualTo(su5)
                    .isNotEqualTo(null)
                    .isNotEqualTo(new Object());
   }
