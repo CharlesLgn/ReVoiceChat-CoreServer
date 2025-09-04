@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import fr.revoicechat.core.error.BadRequestException;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation.CreatedMediaDataRepresentation;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestMessageValidation {
 
   @Test

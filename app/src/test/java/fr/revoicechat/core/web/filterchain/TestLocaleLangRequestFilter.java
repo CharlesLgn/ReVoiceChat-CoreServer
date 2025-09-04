@@ -10,7 +10,9 @@ import org.jboss.resteasy.mock.MockHttpRequest;
 import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.nls.http.CurrentRequestHolder;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestLocaleLangRequestFilter {
 
   @Test

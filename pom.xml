@@ -12,7 +12,6 @@
 
   <modules>
     <module>app</module>
-    <module>test-coverage</module>
   </modules>
 
   <properties>
@@ -27,8 +26,8 @@
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.5.3</surefire-plugin.version>
 
-    <jacoco.xmlReportFile>${project.basedir}/test-coverage/target/site/jacoco-aggregate/jacoco.xml</jacoco.xmlReportFile>
-    <sonar.coverage.jacoco.xmlReportPaths>${jacoco.xmlReportFile}</sonar.coverage.jacoco.xmlReportPaths>
+    <quarkus.test.coverage.enabled>true</quarkus.test.coverage.enabled>
+    <sonar.coverage.jacoco.xmlReportPaths>../target/coverage/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
   </properties>
 
   <dependencyManagement>
@@ -165,7 +164,11 @@
           <systemPropertyVariables>
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
             <maven.home>${maven.home}</maven.home>
+            <quarkus.jacoco.data-file>${maven.multiModuleProjectDirectory}/target/jacoco.exec</quarkus.jacoco.data-file>
+            <quarkus.jacoco.reuse-data-file>true</quarkus.jacoco.reuse-data-file>
+            <quarkus.jacoco.report-location>${maven.multiModuleProjectDirectory}/target/coverage</quarkus.jacoco.report-location>
           </systemPropertyVariables>
+          <argLine>${argLine}</argLine>
         </configuration>
       </plugin>
       <plugin>
@@ -185,6 +188,9 @@
             </native.image.path>
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
             <maven.home>${maven.home}</maven.home>
+            <quarkus.jacoco.data-file>${maven.multiModuleProjectDirectory}/target/jacoco.exec</quarkus.jacoco.data-file>
+            <quarkus.jacoco.reuse-data-file>true</quarkus.jacoco.reuse-data-file>
+            <quarkus.jacoco.report-location>${maven.multiModuleProjectDirectory}/target/coverage</quarkus.jacoco.report-location>
           </systemPropertyVariables>
         </configuration>
       </plugin>

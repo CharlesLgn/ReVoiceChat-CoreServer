@@ -12,7 +12,9 @@ import fr.revoicechat.notification.service.NotificationService.SseHolder;
 import fr.revoicechat.notification.stub.NotificationPayloadMock;
 import fr.revoicechat.notification.stub.NotificationRegistrableMock;
 import fr.revoicechat.notification.stub.SseEventSinkMock;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestNotificationService {
 
   @Test

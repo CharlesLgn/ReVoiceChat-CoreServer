@@ -6,6 +6,9 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest
 class TestMediaData {
   @Test
   @SuppressWarnings({ "java:S5838", "java:S5863" })

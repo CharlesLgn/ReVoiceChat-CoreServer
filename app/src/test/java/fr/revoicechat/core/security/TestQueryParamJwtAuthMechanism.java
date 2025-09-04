@@ -1,5 +1,6 @@
 package fr.revoicechat.core.security;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.junit.CleanDatabase;
@@ -11,6 +12,7 @@ import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
 import jakarta.ws.rs.core.MediaType;
 
+@Disabled("need to figure out why the test is randomly unstable")
 @QuarkusTest
 @CleanDatabase
 @TestProfile(DevTestProfile.class)

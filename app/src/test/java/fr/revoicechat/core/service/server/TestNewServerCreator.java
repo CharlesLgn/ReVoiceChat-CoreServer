@@ -14,7 +14,9 @@ import fr.revoicechat.core.model.Room;
 import fr.revoicechat.core.model.RoomType;
 import fr.revoicechat.core.model.Server;
 import fr.revoicechat.core.stub.EntityManagerMock;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 @ExtendWith({ SoftAssertionsExtension.class })
 class TestNewServerCreator {
 

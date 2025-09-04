@@ -8,7 +8,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import fr.revoicechat.core.model.FileType;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestFileTypeDetermination {
 
   @ParameterizedTest

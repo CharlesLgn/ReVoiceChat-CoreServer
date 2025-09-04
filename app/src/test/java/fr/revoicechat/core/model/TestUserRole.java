@@ -7,7 +7,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.model.UserRole.UserRolePK;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestUserRole {
 
   @Test

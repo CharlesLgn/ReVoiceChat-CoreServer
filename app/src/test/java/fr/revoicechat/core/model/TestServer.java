@@ -6,6 +6,9 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest
 class TestServer {
 
   @Test

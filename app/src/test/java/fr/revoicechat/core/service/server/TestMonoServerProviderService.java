@@ -11,7 +11,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import fr.revoicechat.core.model.Server;
 import fr.revoicechat.core.repository.ServerRepository;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestMonoServerProviderService {
 
   @Test

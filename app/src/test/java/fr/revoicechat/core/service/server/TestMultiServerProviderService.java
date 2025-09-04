@@ -9,7 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.model.Server;
 import fr.revoicechat.core.repository.ServerRepository;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class TestMultiServerProviderService {
 
   @Test

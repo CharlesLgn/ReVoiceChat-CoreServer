@@ -6,6 +6,9 @@ import java.io.IOError;
 
 import org.junit.jupiter.api.Test;
 
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest
 class TestErrorMapperUtils {
 
   @Test
