@@ -1,0 +1,39 @@
+package fr.revoicechat.core.service;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+
+import org.junit.jupiter.api.Test;
+
+import fr.revoicechat.core.junit.CleanDatabase;
+import fr.revoicechat.core.model.User;
+import fr.revoicechat.core.model.UserType;
+import fr.revoicechat.core.representation.user.SignupRepresentation;
+import fr.revoicechat.core.security.utils.PasswordUtils;
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest
+@CleanDatabase
+class TestUserService {
+
+  @Inject EntityManager entityManager;
+  @Inject UserService userService;
+
+  @Test
+  void testGenerateAdmin() {
+    // Given
+    SignupRepresentation signer = new SignupRepresentation("master", "psw", "master@revoicechat.fr", null);
+    var resultRepresentation = userService.create(signer);
+    assertThat(resultRepresentation).isNotNull();
+    var result = entityManager.find(User.class, resultRepresentation.id());
+    assertThat(result).isNotNull();
+    assertThat(result.getCreatedDate()).isNotNull();
+    assertThat(result.getLogin()).isEqualTo("master");
+    assertThat(result.getDisplayName()).isEqualTo("master");
+    assertThat(result.getPassword()).matches(password -> PasswordUtils.matches("psw", password));
+    assertThat(result.getEmail()).isEqualTo("master@revoicechat.fr");
+    assertThat(result.getType()).isEqualTo(UserType.ADMIN);
+  }
+}

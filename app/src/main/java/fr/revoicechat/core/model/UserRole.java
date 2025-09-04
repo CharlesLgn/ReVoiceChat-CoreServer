@@ -23,16 +23,8 @@ public class UserRole {
     this.pk = pk;
   }
 
-  public Server getServer() {
-    return pk.getServer();
-  }
-
   public void setServer(final Server server) {
     pk.setServer(server);
-  }
-
-  public User getUser() {
-    return pk.getUser();
   }
 
   public void setUser(final User user) {

@@ -62,6 +62,16 @@ class TestInvitationLinkController {
   }
 
   @Test
+  void testRevokeWithNoExistenceDoesNotThrowAnyException() {
+    String token = RestTestUtils.logNewUser();
+    RestAssured.given()
+               .contentType(MediaType.APPLICATION_JSON)
+               .header("Authorization", "Bearer " + token)
+               .when().pathParam("id", UUID.randomUUID()).delete("/invitation/{id}")
+               .then().statusCode(204);
+  }
+
+  @Test
   void testGetInvitationNoResource() {
     String token = RestTestUtils.logNewUser();
     RestAssured.given()
