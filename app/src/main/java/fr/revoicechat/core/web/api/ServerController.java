@@ -6,6 +6,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -19,6 +20,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.openapi.annotations.tags.Tags;
 
+import fr.revoicechat.core.representation.invitation.InvitationRepresentation;
 import fr.revoicechat.core.representation.room.CreationRoomRepresentation;
 import fr.revoicechat.core.representation.room.RoomRepresentation;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
@@ -143,4 +145,24 @@ public interface ServerController extends LoggedApi {
   @GET
   @Path("/{id}/user")
   List<UserRepresentation> fetchUsers(@PathParam("id") UUID id);
+
+  @Tags(refs = { "Server", "Invitation" })
+  @Operation(summary = "Generate an invitation to join a server",
+      description = "Generate an invitation to join a server.")
+  @APIResponse(responseCode = "200", description = "invitation successfully generated",
+      content = @Content(schema = @Schema(implementation = InvitationRepresentation.class))
+  )
+  @POST
+  @Path("/{id}/invitation")
+  InvitationRepresentation generateServerInvitation(@PathParam("id") UUID id);
+
+  @Tags(refs = { "Server", "Invitation" })
+  @Operation(summary = "Get an invitation to join a server",
+      description = "Get an invitation to join a server.")
+  @APIResponse(responseCode = "200", description = "invitations successfully retrieved",
+      content = @Content(schema = @Schema(implementation = InvitationRepresentation.class))
+  )
+  @GET
+  @Path("/{id}/invitation")
+  List<InvitationRepresentation> getAllServerInvitations(@PathParam("id") UUID id);
 }

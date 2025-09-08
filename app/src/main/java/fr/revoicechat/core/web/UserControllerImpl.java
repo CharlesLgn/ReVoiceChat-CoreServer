@@ -1,5 +1,7 @@
 package fr.revoicechat.core.web;
 
+import static fr.revoicechat.security.utils.RevoiceChatRoles.*;
+
 import java.util.UUID;
 
 import fr.revoicechat.core.representation.user.AdminUpdatableUserData;
@@ -16,25 +18,25 @@ public class UserControllerImpl implements UserController {
   public UserControllerImpl(final UserService userService) {this.userService = userService;}
 
   @Override
-  @RolesAllowed("USER")
+  @RolesAllowed(ROLE_USER)
   public UserRepresentation me() {
     return userService.findCurrentUser();
   }
 
   @Override
-  @RolesAllowed("USER")
+  @RolesAllowed(ROLE_USER)
   public UserRepresentation me(final UpdatableUserData userData) {
     return userService.updateConnectedUser(userData);
   }
 
   @Override
-  @RolesAllowed("USER")
+  @RolesAllowed(ROLE_USER)
   public UserRepresentation get(UUID id) {
     return userService.get(id);
   }
 
   @Override
-  @RolesAllowed("ADMIN")
+  @RolesAllowed(ROLE_ADMIN)
   public UserRepresentation updateAsAdmin(final UUID id, final AdminUpdatableUserData userData) {
     return userService.updateAsAdmin(id, userData);
   }

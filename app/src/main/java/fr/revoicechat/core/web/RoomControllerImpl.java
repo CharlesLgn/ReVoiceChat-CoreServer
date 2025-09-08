@@ -1,5 +1,7 @@
 package fr.revoicechat.core.web;
 
+import static fr.revoicechat.security.utils.RevoiceChatRoles.ROLE_USER;
+
 import java.util.UUID;
 import jakarta.annotation.security.RolesAllowed;
 
@@ -14,7 +16,7 @@ import fr.revoicechat.core.service.RoomService;
 import fr.revoicechat.core.service.room.RoomPresenceService;
 import fr.revoicechat.core.web.api.RoomController;
 
-@RolesAllowed("USER") // only authenticated users
+@RolesAllowed(ROLE_USER)
 public class RoomControllerImpl implements RoomController {
 
   private final RoomService roomService;

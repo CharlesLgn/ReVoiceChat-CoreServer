@@ -14,15 +14,17 @@ import fr.revoicechat.core.junit.CleanDatabase;
 import fr.revoicechat.core.model.InvitationLink;
 import fr.revoicechat.core.model.InvitationLinkStatus;
 import fr.revoicechat.core.model.InvitationType;
-import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
+import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
 import fr.revoicechat.core.representation.invitation.InvitationRepresentation;
+import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
+import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.web.tests.RestTestUtils;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
 
 @QuarkusTest
-@TestProfile(BasicIntegrationTestProfile.class)
+@TestProfile(MultiServerProfile.class)
 @CleanDatabase
 class TestInvitationLinkController {
 
@@ -38,6 +40,7 @@ class TestInvitationLinkController {
     assertThat(invitationCreated.id()).isNotNull();
     assertThat(invitationCreated.type()).isEqualTo(InvitationType.APPLICATION_JOIN);
     assertThat(invitationCreated.status()).isEqualTo(InvitationLinkStatus.CREATED);
+    assertThat(invitationCreated.targetedServer()).isNull();
     var result = entityManager.find(InvitationLink.class, invitationCreated.id());
     assertThat(result).isNotNull();
     assertThat(result.getSender()).isNotNull();
@@ -93,5 +96,123 @@ class TestInvitationLinkController {
                .header("Authorization", "Bearer " + token)
                .when().pathParam("id", UUID.randomUUID()).get("/invitation/{id}")
                .then().statusCode(404);
+  }
+
+  @Test
+  void testInvitationServer() {
+    String token = RestTestUtils.logNewUser();
+    var server = createServer(token);
+    var invitation = RestAssured.given()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token)
+                                .when().pathParam("id", server.id()).post("/invitation/server/{id}")
+                                .then().statusCode(200)
+                                .extract().body().as(InvitationRepresentation.class);
+    assertThat(invitation.id()).isNotNull();
+    assertThat(invitation.status()).isEqualTo(InvitationLinkStatus.CREATED);
+    assertThat(invitation.type()).isEqualTo(InvitationType.SERVER_JOIN);
+    assertThat(invitation.targetedServer()).isEqualTo(server.id());
+  }
+
+  @Test
+  void testGetAppInvitation() {
+    String tokenAdmin = RestTestUtils.logNewUser("admin");
+    String tokenUser = RestTestUtils.logNewUser("user");
+    var server = createServer(tokenAdmin);
+    serverInvitation(tokenUser, server);
+    serverInvitation(tokenUser, server);
+    applicationInvitation(tokenUser);
+    applicationInvitation(tokenUser);
+    serverInvitation(tokenAdmin, server);
+    applicationInvitation(tokenAdmin);
+    applicationInvitation(tokenAdmin);
+    RestAssured.given()
+               .contentType(MediaType.APPLICATION_JSON)
+               .header("Authorization", "Bearer " + tokenUser)
+               .when().get("/invitation/application")
+               .then().statusCode(403);
+    var appInvitations = RestAssured.given()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .header("Authorization", "Bearer " + tokenAdmin)
+                                    .when().get("/invitation/application")
+                                    .then().statusCode(200)
+                                    .extract().body().jsonPath().getList(".", InvitationRepresentation.class);
+    assertThat(appInvitations).hasSize(4);
+  }
+
+  @Test
+  void testGetServerInvitation() {
+    String tokenAdmin = RestTestUtils.logNewUser("admin");
+    String tokenUser = RestTestUtils.logNewUser("user");
+    var server = createServer(tokenAdmin);
+    serverInvitation(tokenUser, server);
+    serverInvitation(tokenUser, server);
+    applicationInvitation(tokenUser);
+    applicationInvitation(tokenUser);
+    serverInvitation(tokenAdmin, server);
+    applicationInvitation(tokenAdmin);
+    applicationInvitation(tokenAdmin);
+    var appInvitations = RestAssured.given()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .header("Authorization", "Bearer " + tokenAdmin)
+                                    .when().pathParam("id", server.id()).get("/invitation/server/{id}")
+                                    .then().statusCode(200)
+                                    .extract().body().jsonPath().getList(".", InvitationRepresentation.class);
+    assertThat(appInvitations).hasSize(3);
+  }
+
+  @Test
+  void testGetUserInvitation() {
+    String tokenAdmin = RestTestUtils.logNewUser("admin");
+    String tokenUser = RestTestUtils.logNewUser("user");
+    var server = createServer(tokenAdmin);
+    serverInvitation(tokenUser, server);
+    serverInvitation(tokenUser, server);
+    applicationInvitation(tokenUser);
+    applicationInvitation(tokenUser);
+    serverInvitation(tokenAdmin, server);
+    applicationInvitation(tokenAdmin);
+    applicationInvitation(tokenAdmin);
+    var userInvitations = RestAssured.given()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .header("Authorization", "Bearer " + tokenUser)
+                                    .when().get("/invitation")
+                                    .then().statusCode(200)
+                                    .extract().body().jsonPath().getList(".", InvitationRepresentation.class);
+    assertThat(userInvitations).hasSize(4);
+    var adminInvitations = RestAssured.given()
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .header("Authorization", "Bearer " + tokenAdmin)
+                                     .when().get("/invitation")
+                                     .then().statusCode(200)
+                                     .extract().body().jsonPath().getList(".", InvitationRepresentation.class);
+    assertThat(adminInvitations).hasSize(3);
+  }
+
+  private static void serverInvitation(final String tokenUser, final ServerRepresentation server) {
+    RestAssured.given()
+               .contentType(MediaType.APPLICATION_JSON)
+               .header("Authorization", "Bearer " + tokenUser)
+               .when().pathParam("id", server.id()).post("/server/{id}/invitation")
+               .then().statusCode(200);
+  }
+
+  private static void applicationInvitation(final String tokenUser) {
+    RestAssured.given()
+               .contentType(MediaType.APPLICATION_JSON)
+               .header("Authorization", "Bearer " + tokenUser)
+               .when().post("/invitation/application")
+               .then().statusCode(200);
+  }
+
+  private static ServerRepresentation createServer(String token) {
+    var representation = new ServerCreationRepresentation("test");
+    return RestAssured.given()
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .header("Authorization", "Bearer " + token)
+                      .body(representation)
+                      .when().put("/server")
+                      .then().statusCode(200)
+                      .extract().as(ServerRepresentation.class);
   }
 }

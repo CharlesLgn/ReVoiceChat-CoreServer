@@ -1,5 +1,7 @@
 package fr.revoicechat.core.web;
 
+import static fr.revoicechat.security.utils.RevoiceChatRoles.ROLE_USER;
+
 import java.util.UUID;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -9,7 +11,7 @@ import fr.revoicechat.core.representation.message.MessageRepresentation;
 import fr.revoicechat.core.service.MessageService;
 import fr.revoicechat.core.web.api.MessageController;
 
-@RolesAllowed("USER") // only authenticated users
+@RolesAllowed(ROLE_USER)
 public class MessageControllerImpl implements MessageController {
 
   private final MessageService messageService;

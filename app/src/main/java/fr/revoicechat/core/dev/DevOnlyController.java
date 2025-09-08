@@ -1,5 +1,7 @@
 package fr.revoicechat.core.dev;
 
+import static fr.revoicechat.security.utils.RevoiceChatRoles.ROLE_USER;
+
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.GET;
@@ -12,7 +14,7 @@ import io.quarkus.arc.profile.IfBuildProfile;
 public class DevOnlyController {
 
   @GET
-  @RolesAllowed("USER")
+  @RolesAllowed(ROLE_USER)
   @Path(("/secured-endpoint"))
   public DevOnlyData securedEndpoint() {
     return new DevOnlyData("secured-endpoint");
