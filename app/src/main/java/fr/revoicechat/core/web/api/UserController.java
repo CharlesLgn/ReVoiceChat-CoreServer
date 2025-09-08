@@ -22,7 +22,6 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/user")
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "User", description = "Endpoints for managing user")
-@Tag(name = "User", description = "Endpoints for managing user")
 public interface UserController extends LoggedApi {
 
   @Operation(summary = "Get details of the connected user", description = "Retrieve the details of the specific connected user.")

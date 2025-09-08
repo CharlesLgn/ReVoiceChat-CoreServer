@@ -1,5 +1,7 @@
 package fr.revoicechat.notification.web;
 
+import static fr.revoicechat.security.utils.RevoiceChatRoles.ROLE_USER;
+
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.GET;
@@ -40,7 +42,7 @@ public class NotificationController implements LoggedApi {
   @GET
   @Produces(MediaType.SERVER_SENT_EVENTS)
   @SseElementType(MediaType.APPLICATION_JSON)
-  @RolesAllowed("USER") // only authenticated users
+  @RolesAllowed(ROLE_USER)
   public void generateSseEmitter(@Context SseEventSink sink) {
     var user = holder.get();
     notificationRegistry.register(user, sink);

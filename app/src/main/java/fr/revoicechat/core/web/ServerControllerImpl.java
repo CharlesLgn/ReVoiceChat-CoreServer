@@ -1,9 +1,12 @@
 package fr.revoicechat.core.web;
 
+import static fr.revoicechat.security.utils.RevoiceChatRoles.ROLE_USER;
+
 import java.util.List;
 import java.util.UUID;
 import jakarta.annotation.security.RolesAllowed;
 
+import fr.revoicechat.core.representation.invitation.InvitationRepresentation;
 import fr.revoicechat.core.representation.room.CreationRoomRepresentation;
 import fr.revoicechat.core.representation.room.RoomRepresentation;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
@@ -12,19 +15,22 @@ import fr.revoicechat.core.representation.user.UserRepresentation;
 import fr.revoicechat.core.service.RoomService;
 import fr.revoicechat.core.service.ServerService;
 import fr.revoicechat.core.service.UserService;
+import fr.revoicechat.core.service.invitation.InvitationLinkService;
 import fr.revoicechat.core.web.api.ServerController;
 
-@RolesAllowed("USER") // only authenticated users
+@RolesAllowed(ROLE_USER)
 public class ServerControllerImpl implements ServerController {
 
   private final ServerService serverService;
   private final RoomService roomService;
   private final UserService userService;
+  private final InvitationLinkService invitationLinkService;
 
-  public ServerControllerImpl(ServerService serverService, final RoomService roomService, final UserService userService) {
+  public ServerControllerImpl(ServerService serverService, RoomService roomService, UserService userService, InvitationLinkService invitationLinkService) {
     this.serverService = serverService;
     this.roomService = roomService;
     this.userService = userService;
+    this.invitationLinkService = invitationLinkService;
   }
 
   @Override
@@ -65,5 +71,15 @@ public class ServerControllerImpl implements ServerController {
   @Override
   public List<UserRepresentation> fetchUsers(final UUID id) {
     return userService.fetchUserForServer(id);
+  }
+
+  @Override
+  public InvitationRepresentation generateServerInvitation(final UUID id) {
+    return invitationLinkService.generateServerInvitation(id);
+  }
+
+  @Override
+  public List<InvitationRepresentation> getAllServerInvitations(final UUID id) {
+    return invitationLinkService.getAllServerInvitations(id);
   }
 }
