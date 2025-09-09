@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import jakarta.annotation.security.RolesAllowed;
 
+import fr.revoicechat.core.model.server.ServerStructure;
 import fr.revoicechat.core.representation.invitation.InvitationRepresentation;
 import fr.revoicechat.core.representation.room.CreationRoomRepresentation;
 import fr.revoicechat.core.representation.room.RoomRepresentation;
@@ -61,6 +62,16 @@ public class ServerControllerImpl implements ServerController {
   @Override
   public List<RoomRepresentation> getRooms(UUID id) {
     return roomService.findAll(id);
+  }
+
+  @Override
+  public ServerStructure getStructure(final UUID id) {
+    return serverService.getStructure(id);
+  }
+
+  @Override
+  public ServerStructure getStructure(final UUID id, final ServerStructure structure) {
+    return serverService.updateStructure(id, structure);
   }
 
   @Override

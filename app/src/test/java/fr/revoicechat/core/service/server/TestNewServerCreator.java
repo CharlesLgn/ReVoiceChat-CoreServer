@@ -29,13 +29,15 @@ class TestNewServerCreator {
       new NewServerCreator(em).create(server);
       // Then
       softly.assertThat(server.getId()).isNotNull();
-      assertThat(em.saved).hasSize(4);
+      assertThat(em.saved).hasSize(5);
+      assertThat(em.saved.get(0)).isInstanceOf(Server.class);
       Room room1 = (Room) em.saved.get(1);
       assertRoom(softly, room1, "General", server, RoomType.TEXT);
       Room room2 = (Room) em.saved.get(2);
       assertRoom(softly, room2, "Random", server, RoomType.TEXT);
       Room room3 = (Room) em.saved.get(3);
       assertRoom(softly, room3, "Vocal", server, RoomType.VOICE);
+      assertThat(em.saved.get(4)).isInstanceOf(Server.class);
     }
   }
 
