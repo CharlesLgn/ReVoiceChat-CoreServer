@@ -1,6 +1,8 @@
 package fr.revoicechat.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -10,6 +12,10 @@ import jakarta.transaction.Transactional;
 import fr.revoicechat.core.error.BadRequestException;
 import fr.revoicechat.core.error.ResourceNotFoundException;
 import fr.revoicechat.core.model.Room;
+import fr.revoicechat.core.model.server.ServerCategory;
+import fr.revoicechat.core.model.server.ServerItem;
+import fr.revoicechat.core.model.server.ServerRoom;
+import fr.revoicechat.core.model.server.ServerStructure;
 import fr.revoicechat.core.nls.RoomErrorCode;
 import fr.revoicechat.core.repository.RoomRepository;
 import fr.revoicechat.core.representation.notification.NotificationActionType;
@@ -72,6 +78,9 @@ public class RoomService {
     var server = serverService.getEntity(id);
     room.setServer(server);
     entityManager.persist(room);
+    var structure = new ServerStructure(new ArrayList<>());
+    structure.items().addAll(server.getStructure().items());
+    structure.items().add(new ServerRoom(room.getId()));
     var representation = toReprsentation(room);
     Notification.of(new RoomNotification(representation, NotificationActionType.ADD)).sendTo(roomUserFinder.find(room.getId()));
     return representation;
@@ -115,6 +124,10 @@ public class RoomService {
    */
   @Transactional
   public UUID delete(final UUID id) {
+    var room = getRoom(id);
+    var server = room.getServer();
+    server.setStructure(removeFromStructure(server.getStructure(), room));
+    entityManager.persist(server);
     Optional.ofNullable(entityManager.find(Room.class, id)).ifPresent(entityManager::remove);
     Notification.of(new RoomNotification(new RoomRepresentation(id, null, null, null), NotificationActionType.REMOVE)).sendTo(roomUserFinder.find(id));
     return id;
@@ -131,5 +144,24 @@ public class RoomService {
         room.getType(),
         room.getServer().getId()
     );
+  }
+
+  private ServerStructure removeFromStructure(ServerStructure structure, Room room) {
+    return new ServerStructure(
+        structure.items().stream()
+                 .map(i -> removeFromStructure(i, room.getId()))
+                 .filter(Objects::nonNull)
+                 .toList());
+  }
+
+  private ServerItem removeFromStructure(ServerItem item, UUID roomId) {
+    return switch (item) {
+      case ServerRoom room when room.id().equals(roomId) -> null;
+      case ServerCategory(String name, List<ServerItem> items) -> new ServerCategory(name, items.stream()
+                                                                                                .map(i -> removeFromStructure(i, roomId))
+                                                                                                .filter(Objects::nonNull)
+                                                                                                .toList());
+      case null, default -> item;
+    };
   }
 }

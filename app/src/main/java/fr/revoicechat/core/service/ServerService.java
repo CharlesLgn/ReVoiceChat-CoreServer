@@ -12,10 +12,11 @@ import fr.revoicechat.core.model.Server;
 import fr.revoicechat.core.model.ServerUser;
 import fr.revoicechat.core.model.User;
 import fr.revoicechat.core.model.UserType;
+import fr.revoicechat.core.model.server.ServerStructure;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
-import fr.revoicechat.security.UserHolder;
 import fr.revoicechat.core.service.server.ServerProviderService;
+import fr.revoicechat.security.UserHolder;
 import io.quarkus.security.UnauthorizedException;
 
 /**
@@ -131,5 +132,17 @@ public class ServerService {
         server.getName(),
         Optional.ofNullable(server.getOwner()).map(User::getId).orElse(null)
     );
+  }
+
+  public ServerStructure getStructure(final UUID id) {
+    return getEntity(id).getStructure();
+  }
+
+  @Transactional
+  public ServerStructure updateStructure(final UUID id, final ServerStructure structure) {
+    var server = getEntity(id);
+    server.setStructure(structure);
+    entityManager.persist(server);
+    return structure;
   }
 }

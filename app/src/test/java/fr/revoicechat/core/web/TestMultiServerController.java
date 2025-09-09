@@ -12,8 +12,12 @@ import org.junit.jupiter.api.Test;
 import fr.revoicechat.core.junit.CleanDatabase;
 import fr.revoicechat.core.model.InvitationLinkStatus;
 import fr.revoicechat.core.model.InvitationType;
+import fr.revoicechat.core.model.server.ServerCategory;
+import fr.revoicechat.core.model.server.ServerRoom;
+import fr.revoicechat.core.model.server.ServerStructure;
 import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
 import fr.revoicechat.core.representation.invitation.InvitationRepresentation;
+import fr.revoicechat.core.representation.room.RoomRepresentation;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.representation.user.UserRepresentation;
@@ -145,6 +149,53 @@ class TestMultiServerController {
   }
 
   @Test
+  void testStructure() {
+    String token = RestTestUtils.logNewUser();
+    var server = createServer(token);
+    var structure = RestAssured.given()
+                               .contentType(MediaType.APPLICATION_JSON)
+                               .header("Authorization", "Bearer " + token)
+                               .when().pathParam("id", server.id()).get("/server/{id}/structure")
+                               .then().statusCode(200)
+                               .extract()
+                               .body().as(ServerStructure.class);
+    assertThat(structure.items()).hasSize(2);
+    var item1 = (ServerCategory) structure.items().getFirst();
+    assertThat(item1.name()).isEqualTo("text");
+    assertThat(item1.items()).hasSize(2);
+    var room1 = (ServerRoom) item1.items().getFirst();
+    assertThat(getRoom(token, room1.id()).name()).isEqualTo("General");
+    var room2 = (ServerRoom) item1.items().getLast();
+    assertThat(getRoom(token, room2.id()).name()).isEqualTo("Random");
+    assertThat(item1.items()).hasSize(2);
+    var item2 = (ServerCategory) structure.items().getLast();
+    assertThat(item2.name()).isEqualTo("vocal");
+    assertThat(item2.items()).hasSize(1);
+    var room3 = (ServerRoom) item2.items().getFirst();
+    assertThat(getRoom(token, room3.id()).name()).isEqualTo("Vocal");
+  }
+
+  @Test
+  void testUpdateStructure() {
+    String token = RestTestUtils.logNewUser();
+    var server = createServer(token);
+    RestAssured.given()
+               .contentType(MediaType.APPLICATION_JSON)
+               .header("Authorization", "Bearer " + token)
+               .body(new ServerStructure(List.of()))
+               .when().pathParam("id", server.id()).patch("/server/{id}/structure")
+               .then().statusCode(200);
+    var structure = RestAssured.given()
+                               .contentType(MediaType.APPLICATION_JSON)
+                               .header("Authorization", "Bearer " + token)
+                               .when().pathParam("id", server.id()).get("/server/{id}/structure")
+                               .then().statusCode(200)
+                               .extract()
+                               .body().as(ServerStructure.class);
+    assertThat(structure.items()).isEmpty();
+  }
+
+  @Test
   void testInvitationServer() {
     String token = RestTestUtils.logNewUser();
     var server = createServer(token);
@@ -220,5 +271,15 @@ class TestMultiServerController {
                       .then().statusCode(200)
                       .extract()
                       .body().jsonPath().getList(".", ServerRepresentation.class);
+  }
+
+  private RoomRepresentation getRoom(String token, UUID id) {
+    return RestAssured.given()
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .header("Authorization", "Bearer " + token)
+                      .when().pathParam("id", id).get("/room/{id}")
+                      .then().statusCode(200)
+                      .extract()
+                      .body().as(RoomRepresentation.class);
   }
 }

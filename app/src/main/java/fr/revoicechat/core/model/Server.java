@@ -2,11 +2,16 @@ package fr.revoicechat.core.model;
 
 import java.util.Objects;
 import java.util.UUID;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
+import fr.revoicechat.core.model.server.ServerStructure;
+import fr.revoicechat.core.repository.jpa.ServerStructureConverter;
 
 @Entity
 @Table(name = "RVC_SERVER")
@@ -18,6 +23,9 @@ public class Server {
   @ManyToOne
   @JoinColumn(name="OWNER_ID")
   private User owner;
+  @Convert(converter = ServerStructureConverter.class)
+  @Column(columnDefinition = "TEXT")
+  private ServerStructure structure;
 
   public Server() {
     super();
@@ -45,6 +53,14 @@ public class Server {
 
   public void setOwner(final User owner) {
     this.owner = owner;
+  }
+
+  public ServerStructure getStructure() {
+    return structure;
+  }
+
+  public void setStructure(final ServerStructure structure) {
+    this.structure = structure;
   }
 
   @Override
