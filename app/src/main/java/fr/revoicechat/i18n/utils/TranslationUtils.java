@@ -1,4 +1,4 @@
-package fr.revoicechat.core.nls.utils;
+package fr.revoicechat.i18n.utils;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import fr.revoicechat.core.nls.LocalizedMessage;
+import fr.revoicechat.i18n.LocalizedMessage;
 
 public class TranslationUtils {
 

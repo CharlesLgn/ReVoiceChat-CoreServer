@@ -8,7 +8,7 @@ import java.util.List;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 
-import fr.revoicechat.core.nls.LocalizedMessage;
+import fr.revoicechat.i18n.LocalizedMessage;
 
 final class ErrorMapperUtils {
   private ErrorMapperUtils() {}

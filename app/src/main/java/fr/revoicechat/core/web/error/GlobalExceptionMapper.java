@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.revoicechat.core.error.BadRequestException;
 import fr.revoicechat.core.error.ResourceNotFoundException;
-import fr.revoicechat.core.nls.LocalizedMessage;
+import fr.revoicechat.i18n.LocalizedMessage;
 import io.quarkus.security.ForbiddenException;
 import io.quarkus.security.UnauthorizedException;
 

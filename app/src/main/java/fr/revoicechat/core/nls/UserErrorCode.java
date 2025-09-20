@@ -1,5 +1,7 @@
 package fr.revoicechat.core.nls;
 
+import fr.revoicechat.i18n.LocalizedMessage;
+
 public enum UserErrorCode implements LocalizedMessage {
   USER_WITH_NO_VALID_INVITATION,
   USER_PASSWORD_WRONG,

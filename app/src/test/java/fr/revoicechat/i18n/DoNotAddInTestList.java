@@ -1,4 +1,4 @@
-package fr.revoicechat.core.nls;
+package fr.revoicechat.i18n;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

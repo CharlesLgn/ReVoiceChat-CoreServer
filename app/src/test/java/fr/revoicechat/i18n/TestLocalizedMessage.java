@@ -1,6 +1,6 @@
-package fr.revoicechat.core.nls;
+package fr.revoicechat.i18n;
 
-import static fr.revoicechat.core.nls.LocalizedMessageTestEnum.*;
+import static fr.revoicechat.i18n.LocalizedMessageTestEnum.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;

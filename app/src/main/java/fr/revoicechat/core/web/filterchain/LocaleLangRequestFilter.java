@@ -7,7 +7,7 @@ import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.container.PreMatching;
 import jakarta.ws.rs.ext.Provider;
 
-import fr.revoicechat.core.nls.http.CurrentRequestHolder;
+import fr.revoicechat.i18n.http.CurrentRequestHolder;
 
 @Provider
 @PreMatching

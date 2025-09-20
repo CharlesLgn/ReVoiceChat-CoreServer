@@ -9,7 +9,7 @@ import org.jboss.resteasy.core.interception.jaxrs.ResponseContainerRequestContex
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.junit.jupiter.api.Test;
 
-import fr.revoicechat.core.nls.http.CurrentRequestHolder;
+import fr.revoicechat.i18n.http.CurrentRequestHolder;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest

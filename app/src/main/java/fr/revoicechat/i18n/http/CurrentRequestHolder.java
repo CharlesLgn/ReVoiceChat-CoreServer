@@ -1,4 +1,4 @@
-package fr.revoicechat.core.nls.http;
+package fr.revoicechat.i18n.http;
 
 import java.util.ArrayList;
 import java.util.Collections;
