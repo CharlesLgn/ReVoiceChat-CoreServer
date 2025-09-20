@@ -18,9 +18,9 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public User findByLogin(String login) {
     List<User> users = entityManager.createQuery("""
-                                                     select u
-                                                     from User u
-                                                     where u.login = :login""", User.class)
+                                        select u
+                                        from User u
+                                        where u.login = :login""", User.class)
                                     .setParameter("login", login)
                                     .getResultList();
     if (users.isEmpty()) {

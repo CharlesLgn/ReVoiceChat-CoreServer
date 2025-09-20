@@ -19,7 +19,7 @@ import org.junit.jupiter.api.io.TempDir;
 import fr.revoicechat.core.error.BadRequestException;
 import fr.revoicechat.core.error.ResourceNotFoundException;
 import fr.revoicechat.core.nls.CommonErrorCode;
-import fr.revoicechat.core.nls.LocalizedMessageTestEnum;
+import fr.revoicechat.i18n.LocalizedMessageTestEnum;
 import fr.revoicechat.core.stub.HttpHeadersMock;
 import io.quarkus.security.ForbiddenException;
 import io.quarkus.security.UnauthorizedException;

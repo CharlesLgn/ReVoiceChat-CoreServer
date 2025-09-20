@@ -1,6 +1,6 @@
 package fr.revoicechat.core.error;
 
-import fr.revoicechat.core.nls.LocalizedMessage;
+import fr.revoicechat.i18n.LocalizedMessage;
 
 /**
  * Exception thrown when a requested resource cannot be found.

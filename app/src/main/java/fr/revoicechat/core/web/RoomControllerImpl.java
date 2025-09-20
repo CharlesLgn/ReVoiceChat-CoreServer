@@ -3,7 +3,6 @@ package fr.revoicechat.core.web;
 import static fr.revoicechat.security.utils.RevoiceChatRoles.ROLE_USER;
 
 import java.util.UUID;
-import jakarta.annotation.security.RolesAllowed;
 
 import fr.revoicechat.core.repository.page.PageResult;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation;
@@ -11,10 +10,14 @@ import fr.revoicechat.core.representation.message.MessageRepresentation;
 import fr.revoicechat.core.representation.room.CreationRoomRepresentation;
 import fr.revoicechat.core.representation.room.RoomPresence;
 import fr.revoicechat.core.representation.room.RoomRepresentation;
+import fr.revoicechat.core.retriever.EntityByRoomIdRetriever;
 import fr.revoicechat.core.service.MessageService;
 import fr.revoicechat.core.service.RoomService;
 import fr.revoicechat.core.service.room.RoomPresenceService;
 import fr.revoicechat.core.web.api.RoomController;
+import fr.revoicechat.risk.RisksMembership;
+import fr.revoicechat.risk.RisksMembershipData;
+import jakarta.annotation.security.RolesAllowed;
 
 @RolesAllowed(ROLE_USER)
 public class RoomControllerImpl implements RoomController {
@@ -23,7 +26,7 @@ public class RoomControllerImpl implements RoomController {
   private final RoomPresenceService roomPresenceService;
   private final MessageService messageService;
 
-  public RoomControllerImpl(RoomService roomService, RoomPresenceService roomPresenceService, MessageService messageService) {
+  public RoomControllerImpl(final RoomService roomService, final RoomPresenceService roomPresenceService, final MessageService messageService) {
     this.roomService = roomService;
     this.roomPresenceService = roomPresenceService;
     this.messageService = messageService;
@@ -46,12 +49,16 @@ public class RoomControllerImpl implements RoomController {
 
 
   @Override
+  @RisksMembership
+  @RisksMembershipData(risks = "SERVER_ROOM_READ_MESSAGE", retriever = EntityByRoomIdRetriever.class)
   public PageResult<MessageRepresentation> messages(UUID roomId, int page, int size) {
     var sizeParam = size == 0 ? 50 : size;
     return messageService.getMessagesByRoom(roomId, page, sizeParam);
   }
 
   @Override
+  @RisksMembership
+  @RisksMembershipData(risks = "SERVER_ROOM_SEND_MESSAGE", retriever = EntityByRoomIdRetriever.class)
   public MessageRepresentation sendMessage(UUID roomId, CreatedMessageRepresentation representation) {
     return messageService.create(roomId, representation);
   }

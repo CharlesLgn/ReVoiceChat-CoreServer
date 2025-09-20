@@ -1,10 +1,10 @@
-package fr.revoicechat.core.nls;
+package fr.revoicechat.i18n;
 
 import java.util.List;
 import java.util.Locale;
 
-import fr.revoicechat.core.nls.http.CurrentRequestHolder;
-import fr.revoicechat.core.nls.utils.TranslationUtils;
+import fr.revoicechat.i18n.http.CurrentRequestHolder;
+import fr.revoicechat.i18n.utils.TranslationUtils;
 
 public interface LocalizedMessage {
 

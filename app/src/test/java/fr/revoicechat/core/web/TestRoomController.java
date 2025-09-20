@@ -6,7 +6,6 @@ import static org.awaitility.Awaitility.await;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-import jakarta.ws.rs.core.MediaType;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,6 +25,7 @@ import fr.revoicechat.core.web.tests.RestTestUtils;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
+import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
 @TestProfile(MultiServerProfile.class)
