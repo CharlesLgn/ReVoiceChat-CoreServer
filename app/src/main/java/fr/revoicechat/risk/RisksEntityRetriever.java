@@ -5,7 +5,7 @@ import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import fr.revoicechat.risk.model.RiskEntity;
+import fr.revoicechat.risk.technicaldata.RiskEntity;
 import jakarta.interceptor.InvocationContext;
 
 public interface RisksEntityRetriever {

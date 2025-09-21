@@ -29,7 +29,7 @@ public class ServerRoles {
   @JoinTable(name = "RVC_USER_SERVER_ROLES",
       joinColumns = @JoinColumn(name = "SERVER_ROLE_ID", referencedColumnName = "ID"),
       inverseJoinColumns = @JoinColumn(name = "", referencedColumnName = "ID"))
-  private List<RoleUser> users;
+  private List<UserRoleMembership> users;
 
   public UUID getId() {
     return id;
@@ -63,11 +63,11 @@ public class ServerRoles {
     this.server = server;
   }
 
-  public List<RoleUser> getUsers() {
+  public List<UserRoleMembership> getUsers() {
     return users;
   }
 
-  public void setUsers(final List<RoleUser> users) {
+  public void setUsers(final List<UserRoleMembership> users) {
     this.users = users;
   }
 
