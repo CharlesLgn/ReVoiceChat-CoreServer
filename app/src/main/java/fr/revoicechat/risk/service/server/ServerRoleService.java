@@ -26,6 +26,11 @@ public class ServerRoleService {
   }
 
   private ServerRoleRepresentation mapToRepresentation(ServerRoles roles) {
-    return new ServerRoleRepresentation(roles.getId(), roles.getName(), roles.getColor());
+    return new ServerRoleRepresentation(
+        roles.getId(),
+        roles.getName(),
+        roles.getColor(),
+        roles.getServer()
+    );
   }
 }
