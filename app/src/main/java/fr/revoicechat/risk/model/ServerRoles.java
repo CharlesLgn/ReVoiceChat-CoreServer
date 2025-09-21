@@ -28,7 +28,7 @@ public class ServerRoles {
   @ManyToMany
   @JoinTable(name = "RVC_USER_SERVER_ROLES",
       joinColumns = @JoinColumn(name = "SERVER_ROLE_ID", referencedColumnName = "ID"),
-      inverseJoinColumns = @JoinColumn(name = "", referencedColumnName = "ID"))
+      inverseJoinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "ID"))
   private List<UserRoleMembership> users;
 
   public UUID getId() {

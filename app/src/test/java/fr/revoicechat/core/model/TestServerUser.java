@@ -13,7 +13,7 @@ import io.quarkus.test.junit.QuarkusTest;
 class TestServerUser {
 
   @Test
-  @SuppressWarnings({ "java:S5838", "java:S5863" })
+  @SuppressWarnings({ "java:S5838", "java:S5863", "EqualsWithItself" })
   void test() {
     var id1 = UUID.randomUUID();
     var server1 = new Server();
@@ -56,7 +56,7 @@ class TestServerUser {
   }
 
   @Test
-  @SuppressWarnings({ "java:S5838", "java:S5863" })
+  @SuppressWarnings({ "java:S5838", "java:S5863", "EqualsWithItself" })
   void testServerUserId() {
     var id1 = UUID.randomUUID();
     var su1 = new ServerUserId();

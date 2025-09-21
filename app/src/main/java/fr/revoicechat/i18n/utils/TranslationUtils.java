@@ -14,14 +14,14 @@ public class TranslationUtils {
 
   private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
-  public static String translate(LocalizedMessage message, List<Locale> accepableLanguage, Object... args) {
-    for (Locale locale : accepableLanguage) {
+  public static String translate(LocalizedMessage message, List<Locale> acceptedLanguage, Object... args) {
+    for (Locale locale : acceptedLanguage) {
       try {
         ResourceBundle bundle = ResourceBundle.getBundle(message.fileName(), locale, new FallbackToEnglishControl());
         String pattern = bundle.getString(message.name());
         return MessageFormat.format(pattern, args);
       } catch (MissingResourceException e) {
-        // is the first acceptable language is not present, we test the next
+        // is the first accepted language is not present, we test the next one
       }
     }
     return message.name();

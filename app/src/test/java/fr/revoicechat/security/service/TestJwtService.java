@@ -20,15 +20,28 @@ class TestJwtService {
   @Inject JWTParser jwtParser;
 
   @Test
-  void test() throws ParseException {
+  void testUser1() throws ParseException {
     var id = UUID.randomUUID();
-    var user = new AuthenticatedUserMock(id, "user name", "login", Set.of("USER", "OTHER"));
+    var user = new AuthenticatedUserMock(id, "Rex Woof", "rex_woof", Set.of("ADMIN", "USER"));
+    var token = jwtService.generate(user);
+    var result = jwtParser.parse(token);
+    assertThat(result).isNotNull();
+    assertThat(result.getGroups()).containsExactlyInAnyOrder("ADMIN", "USER");
+    assertThat(result.getName()).isEqualTo(id.toString());
+    assertThat(result.getSubject()).isEqualTo("rex_woof");
+    assertThat(jwtService.retrieveUserAsId(token)).isEqualTo(id);
+  }
+
+  @Test
+  void testUser2() throws ParseException {
+    var id = UUID.randomUUID();
+    var user = new AuthenticatedUserMock(id, "Nyphew", "nyphew", Set.of("USER", "OTHER"));
     var token = jwtService.generate(user);
     var result = jwtParser.parse(token);
     assertThat(result).isNotNull();
     assertThat(result.getGroups()).containsExactlyInAnyOrder("USER", "OTHER");
     assertThat(result.getName()).isEqualTo(id.toString());
-    assertThat(result.getSubject()).isEqualTo("login");
+    assertThat(result.getSubject()).isEqualTo("nyphew");
     assertThat(jwtService.retrieveUserAsId(token)).isEqualTo(id);
   }
 
