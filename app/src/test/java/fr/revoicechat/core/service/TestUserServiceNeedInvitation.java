@@ -8,9 +8,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,10 +24,13 @@ import fr.revoicechat.core.model.UserType;
 import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
 import fr.revoicechat.core.representation.user.SignupRepresentation;
 import fr.revoicechat.core.representation.user.UserRepresentation;
-import fr.revoicechat.security.utils.PasswordUtils;
 import fr.revoicechat.core.service.TestUserServiceNeedInvitation.AppOnlyAccessibleByInvitationTrue;
+import fr.revoicechat.security.utils.PasswordUtils;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 @QuarkusTest
 @CleanDatabase
@@ -74,7 +74,7 @@ class TestUserServiceNeedInvitation {
   }
 
   @ParameterizedTest
-  @EnumSource(names = "CREATED", mode = Mode.EXCLUDE)
+  @EnumSource(value = InvitationLinkStatus.class, names = "CREATED", mode = Mode.EXCLUDE)
   @Transactional
   void testWithInvalidStatusInvitationLink(InvitationLinkStatus status) {
     var adminRep = userService.create(new SignupRepresentation("master", "psw", "master@revoicechat.fr", UUID.randomUUID()));
@@ -85,7 +85,7 @@ class TestUserServiceNeedInvitation {
   }
 
   @ParameterizedTest
-  @EnumSource(names = "APPLICATION_JOIN", mode = Mode.EXCLUDE)
+  @EnumSource(value = InvitationType.class, names = "APPLICATION_JOIN", mode = Mode.EXCLUDE)
   @Transactional
   void testWithInvalidTypeInvitationLink(InvitationType type) {
     var adminRep = userService.create(new SignupRepresentation("master", "psw", "master@revoicechat.fr", UUID.randomUUID()));

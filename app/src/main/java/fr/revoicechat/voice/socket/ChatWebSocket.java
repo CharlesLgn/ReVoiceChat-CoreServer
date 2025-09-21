@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -55,7 +56,10 @@ public class ChatWebSocket implements ConnectedUserRetriever {
   private final UserHolder userHolder;
   private final RoomUserFinder roomUserFinder;
 
-  public ChatWebSocket(ManagedExecutor executor, EntityManager entityManager, UserHolder userHolder, final RoomUserFinder roomUserFinder) {
+  public ChatWebSocket(ManagedExecutor executor,
+                       EntityManager entityManager,
+                       UserHolder userHolder,
+                       RoomUserFinder roomUserFinder) {
     this.executor = executor;
     this.entityManager = entityManager;
     this.userHolder = userHolder;
@@ -142,6 +146,7 @@ public class ChatWebSocket implements ConnectedUserRetriever {
   }
 
   @OnClose
+  @SuppressWarnings("unused") // call by websocket listener
   public void onClose(Session session) {
     sessions.stream().filter(userSession -> userSession.session.equals(session))
             .findFirst()
@@ -190,8 +195,8 @@ public class ChatWebSocket implements ConnectedUserRetriever {
   /**
    * Utility: enqueue a task for a specific user, so tasks run sequentially.
    */
-  private CompletableFuture<Void> enqueue(UUID userId, Session session, Supplier<CompletionStage<Void>> task) {
-    return userQueues.compute(userId, (id, prev) -> {
+  private void enqueue(UUID userId, Session session, Supplier<CompletionStage<Void>> task) {
+    userQueues.compute(userId, (id, prev) -> {
       CompletableFuture<Void> start = (prev == null ? CompletableFuture.completedFuture(null) : prev);
       return start
           .thenComposeAsync(v -> task.get(), executor)

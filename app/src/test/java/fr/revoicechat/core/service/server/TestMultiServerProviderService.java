@@ -16,7 +16,7 @@ class TestMultiServerProviderService {
 
   @Test
   void testGetServers() {
-    var repository = new ServerRepositoryMock(2, List.of(new Server(), new Server()));
+    var repository = new ServerRepositoryMock(List.of(new Server(), new Server()));
     var result = new MultiServerProviderService(repository, null, null, null).getServers();
     Assertions.assertThat(result).hasSize(2);
   }
@@ -27,5 +27,10 @@ class TestMultiServerProviderService {
     assertThatCode(service::init).doesNotThrowAnyException();
   }
 
-  private record ServerRepositoryMock(long count, List<Server> findAll) implements ServerRepository {}
+  private record ServerRepositoryMock(List<Server> findAll) implements ServerRepository {
+    @Override
+    public long count() {
+      return 2;
+    }
+  }
 }

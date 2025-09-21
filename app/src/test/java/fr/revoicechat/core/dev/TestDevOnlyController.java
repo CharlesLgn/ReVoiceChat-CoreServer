@@ -36,7 +36,7 @@ class TestDevOnlyController {
                             .then().statusCode(500)
                             .extract().body().asPrettyString();
     Assertions.assertThat(result).contains("\"error\": \"Erreur interne du serveur\",",
-                                           "\"message\": \"Problème est survenu de notre côté. Veuillez réessayer plus tard ou contacter lassistance si le problème persiste.\",",
+                                           "\"message\": \"Problème est survenu de notre côté. Veuillez réessayer plus tard ou contacter l'assistance si le problème persiste.\",",
                                            "\"errorFile\": ",
                                            "\"swaggerDoc\": \"/api/q/swagger-ui\"");
   }

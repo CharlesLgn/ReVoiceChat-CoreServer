@@ -11,7 +11,7 @@ import io.quarkus.test.junit.QuarkusTest;
 @QuarkusTest
 class TestMediaData {
   @Test
-  @SuppressWarnings({ "java:S5838", "java:S5863" })
+  @SuppressWarnings({ "java:S5838", "java:S5863", "EqualsWithItself" })
   void test() {
     var id1 = UUID.randomUUID();
     var media1 = new MediaData();

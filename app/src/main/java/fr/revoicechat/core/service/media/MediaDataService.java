@@ -2,9 +2,6 @@ package fr.revoicechat.core.service.media;
 
 import java.util.List;
 import java.util.UUID;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -14,8 +11,10 @@ import fr.revoicechat.core.model.MediaDataStatus;
 import fr.revoicechat.core.model.MediaOrigin;
 import fr.revoicechat.core.repository.MediaDataRepository;
 import fr.revoicechat.core.representation.media.MediaDataRepresentation;
-import fr.revoicechat.core.representation.media.UpdatableMediaDataStatus;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation.CreatedMediaDataRepresentation;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class MediaDataService {

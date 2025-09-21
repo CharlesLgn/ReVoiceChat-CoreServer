@@ -87,7 +87,7 @@ public class MonoServerProviderService implements ServerProviderService {
   }
 
   @Override
-  public Server create(final Server entity) {
+  public void create(final Server entity) {
     LOG.error("{}", ServerErrorCode.APPLICATION_DOES_NOT_ALLOW_SERVER_CREATION);
     throw new BadRequestException(ServerErrorCode.APPLICATION_DOES_NOT_ALLOW_SERVER_CREATION);
   }
