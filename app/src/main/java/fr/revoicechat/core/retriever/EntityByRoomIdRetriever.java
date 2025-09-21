@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import fr.revoicechat.core.model.Room;
 import fr.revoicechat.risk.RisksEntityRetriever;
-import fr.revoicechat.risk.model.RiskEntity;
+import fr.revoicechat.risk.technicaldata.RiskEntity;
 import jakarta.enterprise.inject.spi.CDI;
 import jakarta.persistence.EntityManager;
 

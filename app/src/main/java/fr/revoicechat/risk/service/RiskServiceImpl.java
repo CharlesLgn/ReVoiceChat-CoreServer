@@ -3,8 +3,8 @@ package fr.revoicechat.risk.service;
 import java.util.List;
 import java.util.UUID;
 
-import fr.revoicechat.risk.model.RiskEntity;
-import fr.revoicechat.risk.model.RoleUser;
+import fr.revoicechat.risk.technicaldata.RiskEntity;
+import fr.revoicechat.risk.model.UserRoleMembership;
 import fr.revoicechat.risk.model.ServerRoles;
 import fr.revoicechat.risk.type.RiskType;
 import fr.revoicechat.security.UserHolder;
@@ -14,7 +14,7 @@ import jakarta.persistence.EntityManager;
 
 @Singleton
 @Unremovable
-public class RiskServiceImpl implements RiskService {
+class RiskServiceImpl implements RiskService {
 
   private final EntityManager entityManager;
   private final UserHolder userHolder;
@@ -41,7 +41,7 @@ public class RiskServiceImpl implements RiskService {
       // no distinct roles = everybody has the habilitations
       return true;
     }
-    var user = entityManager.getReference(RoleUser.class, userId);
+    var user = entityManager.getReference(UserRoleMembership.class, userId);
     return user.getServerRoles().stream().anyMatch(roles::contains);
   }
 

@@ -1,4 +1,4 @@
-package fr.revoicechat.risk.model;
+package fr.revoicechat.risk.technicaldata;
 
 import java.util.UUID;
 

@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "RVC_USER")
-public class RoleUser implements AuthenticatedUser {
+public class UserRoleMembership implements AuthenticatedUser {
   @Id
   private UUID id;
   @ManyToMany
@@ -55,7 +55,7 @@ public class RoleUser implements AuthenticatedUser {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof RoleUser user)) {
+    if (!(o instanceof UserRoleMembership user)) {
       return false;
     }
     return Objects.equals(getId(), user.getId());

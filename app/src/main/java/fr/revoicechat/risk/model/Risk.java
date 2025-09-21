@@ -3,7 +3,7 @@ package fr.revoicechat.risk.model;
 import java.util.Objects;
 import java.util.UUID;
 
-import fr.revoicechat.core.repository.jpa.RiskTypeConverter;
+import fr.revoicechat.risk.service.RiskTypeConverter;
 import fr.revoicechat.risk.type.RiskType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -14,8 +14,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "RVC_ROLE")
-public class Role {
+@Table(name = "RVC_RISK")
+public class Risk {
   @Id
   private UUID id;
   @Column(name = "ENTITY_ID", updatable = false)
@@ -64,7 +64,7 @@ public class Role {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof Role role)) {
+    if (!(o instanceof Risk role)) {
       return false;
     }
     return Objects.equals(getId(), role.getId());

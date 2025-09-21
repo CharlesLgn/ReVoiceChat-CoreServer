@@ -1,6 +1,5 @@
-package fr.revoicechat.core.repository.jpa;
+package fr.revoicechat.risk.service;
 
-import fr.revoicechat.risk.model.DefaultRiskType;
 import fr.revoicechat.risk.type.RiskType;
 import jakarta.persistence.AttributeConverter;
 
