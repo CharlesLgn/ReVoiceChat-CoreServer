@@ -2,7 +2,6 @@ package fr.revoicechat.core.web;
 
 import java.util.List;
 import java.util.UUID;
-import jakarta.ws.rs.core.MediaType;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import fr.revoicechat.core.model.MediaDataStatus;
 import fr.revoicechat.core.model.RoomType;
 import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
 import fr.revoicechat.core.representation.media.MediaDataRepresentation;
-import fr.revoicechat.core.representation.media.UpdatableMediaDataStatus;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation.CreatedMediaDataRepresentation;
 import fr.revoicechat.core.representation.message.MessageRepresentation;
@@ -24,6 +22,8 @@ import fr.revoicechat.core.web.tests.RestTestUtils;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
 @TestProfile(MultiServerProfile.class)
@@ -31,6 +31,7 @@ import io.restassured.RestAssured;
 class TestMediaDataController {
 
   @Test
+  @Transactional
   void testGetMedia() {
     String token = RestTestUtils.logNewUser();
     var server = createServer(token);

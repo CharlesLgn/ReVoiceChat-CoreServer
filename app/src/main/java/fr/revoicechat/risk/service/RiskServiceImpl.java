@@ -8,10 +8,12 @@ import fr.revoicechat.risk.model.RoleUser;
 import fr.revoicechat.risk.model.ServerRoles;
 import fr.revoicechat.risk.type.RiskType;
 import fr.revoicechat.security.UserHolder;
-import jakarta.enterprise.context.ApplicationScoped;
+import io.quarkus.arc.Unremovable;
+import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
 
-@ApplicationScoped
+@Singleton
+@Unremovable
 public class RiskServiceImpl implements RiskService {
 
   private final EntityManager entityManager;
