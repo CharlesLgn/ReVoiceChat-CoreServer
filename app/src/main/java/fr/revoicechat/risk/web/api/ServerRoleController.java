@@ -9,8 +9,10 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
+import fr.revoicechat.risk.representation.CreatedServerRoleRepresentation;
 import fr.revoicechat.risk.representation.ServerRoleRepresentation;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 
@@ -22,7 +24,7 @@ public interface ServerRoleController {
   @APIResponse(responseCode = "200", description = "Role successfully retrieved")
   @APIResponse(
       responseCode = "404",
-      description = "Room not found",
+      description = "Server not found",
       content = @Content(
           mediaType = "text/plain",
           schema = @Schema(implementation = String.class, examples = "Server not found")
@@ -30,4 +32,17 @@ public interface ServerRoleController {
   )
   @GET
   List<ServerRoleRepresentation> getByServer(@PathParam("id") UUID serverId);
+
+  @Operation(summary = "Create role of a server", description = "Create a role for specific server")
+  @APIResponse(responseCode = "200", description = "Role successfully created")
+  @APIResponse(
+      responseCode = "404",
+      description = "Server not found",
+      content = @Content(
+          mediaType = "text/plain",
+          schema = @Schema(implementation = String.class, examples = "Server not found")
+      )
+  )
+  @PUT
+  ServerRoleRepresentation createRole(@PathParam("id") UUID serverId, CreatedServerRoleRepresentation representation);
 }

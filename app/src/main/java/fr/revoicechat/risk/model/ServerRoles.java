@@ -21,6 +21,7 @@ public class ServerRoles {
   @Column(nullable = false)
   private String name;
   private String color;
+  private int priority;
 
   @Column(name = "SERVER_ID", nullable = false, updatable = false)
   private UUID server;
@@ -69,6 +70,14 @@ public class ServerRoles {
 
   public void setUsers(final List<UserRoleMembership> users) {
     this.users = users;
+  }
+
+  public int getPriority() {
+    return priority;
+  }
+
+  public void setPriority(final int priority) {
+    this.priority = priority;
   }
 
   @Override
