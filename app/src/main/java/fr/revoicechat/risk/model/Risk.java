@@ -24,8 +24,9 @@ public class Risk {
   @JoinColumn(name = "ROLE_ID", updatable = false)
   private ServerRoles serverRoles;
   @Convert(converter = RiskTypeConverter.class)
-  @Column(columnDefinition = "TEXT")
-  private RiskType riskType;
+  @Column(name = "RISK_NAME", columnDefinition = "TEXT")
+  private RiskType type;
+  private RiskMode mode;
 
   public UUID getId() {
     return id;
@@ -51,12 +52,20 @@ public class Risk {
     this.serverRoles = serverRoles;
   }
 
-  public RiskType getRiskType() {
-    return riskType;
+  public RiskType getType() {
+    return type;
   }
 
-  public void setRiskType(final RiskType riskType) {
-    this.riskType = riskType;
+  public void setType(final RiskType type) {
+    this.type = type;
+  }
+
+  public RiskMode getMode() {
+    return mode;
+  }
+
+  public void setMode(final RiskMode mode) {
+    this.mode = mode;
   }
 
   @Override
