@@ -1,4 +1,4 @@
-package fr.revoicechat.core.web.api;
+package fr.revoicechat.openapi.api;
 
 import static fr.revoicechat.openapi.OpenApiConfig.*;
 

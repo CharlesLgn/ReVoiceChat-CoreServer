@@ -1,11 +1,14 @@
 package fr.revoicechat.risk.representation;
 
+import java.util.List;
 import java.util.UUID;
 
 public record ServerRoleRepresentation(
     UUID id,
     String name,
     String color,
-    UUID serverId
+    int priority,
+    UUID serverId,
+    List<RiskRepresentation> risks
 ) {
 }

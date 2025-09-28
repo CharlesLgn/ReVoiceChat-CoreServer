@@ -46,7 +46,7 @@ public interface RoleController {
   )
   @Path("user")
   @PUT
-  void addRoleToUser(@PathParam("id") UUID roleId, List<UUID> users);
+  void getRole(@PathParam("id") UUID roleId, List<UUID> users);
 
   @Operation(summary = "Get a role", description = "Get a role")
   @APIResponse(responseCode = "200", description = "Role successfully retrieved")
@@ -59,5 +59,5 @@ public interface RoleController {
       )
   )
   @GET
-  ServerRoleRepresentation addRoleToUser(@PathParam("id") UUID roleId);
+  ServerRoleRepresentation getRole(@PathParam("id") UUID roleId);
 }

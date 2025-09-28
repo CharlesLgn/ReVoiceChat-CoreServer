@@ -12,6 +12,7 @@ import fr.revoicechat.risk.model.UserRoleMembership;
 import fr.revoicechat.risk.repository.RiskRepository;
 import fr.revoicechat.risk.repository.ServerRolesRepository;
 import fr.revoicechat.risk.representation.CreatedServerRoleRepresentation;
+import fr.revoicechat.risk.representation.RiskRepresentation;
 import fr.revoicechat.risk.representation.ServerRoleRepresentation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
@@ -85,7 +86,11 @@ public class ServerRoleService {
         roles.getId(),
         roles.getName(),
         roles.getColor(),
-        roles.getServer()
+        roles.getPriority(),
+        roles.getServer(),
+        riskRepository.getRisks(roles.getId())
+                      .map(risk -> new RiskRepresentation(risk.getType(), risk.getEntity(), risk.getMode()))
+                      .toList()
     );
   }
 
