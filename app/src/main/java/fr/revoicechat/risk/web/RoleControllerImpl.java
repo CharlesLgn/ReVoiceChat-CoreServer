@@ -33,12 +33,12 @@ public class RoleControllerImpl implements RoleController {
   @Override
   @RisksMembership
   @RisksMembershipData(risks = "ADD_USER_ROLE", retriever = ServerRoleIdRetriever.class)
-  public void addRoleToUser(final UUID roleId, final List<UUID> users) {
+  public void getRole(final UUID roleId, final List<UUID> users) {
     serverRoleService.addRoleToUser(roleId, users);
   }
 
   @Override
-  public ServerRoleRepresentation addRoleToUser(final UUID roleId) {
+  public ServerRoleRepresentation getRole(final UUID roleId) {
     return serverRoleService.get(roleId);
   }
 }

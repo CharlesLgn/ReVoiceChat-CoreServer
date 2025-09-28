@@ -10,7 +10,7 @@ import org.jboss.resteasy.annotations.SseElementType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.revoicechat.core.web.api.LoggedApi;
+import fr.revoicechat.openapi.api.LoggedApi;
 import fr.revoicechat.notification.NotificationRegistrableHolder;
 import fr.revoicechat.notification.service.NotificationRegistry;
 import jakarta.annotation.security.PermitAll;

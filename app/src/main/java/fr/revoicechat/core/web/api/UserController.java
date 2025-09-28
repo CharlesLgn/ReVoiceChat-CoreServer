@@ -3,6 +3,7 @@ package fr.revoicechat.core.web.api;
 import java.util.UUID;
 
 import fr.revoicechat.core.representation.user.AdminUpdatableUserData;
+import fr.revoicechat.openapi.api.LoggedApi;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
