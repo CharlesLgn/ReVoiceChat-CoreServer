@@ -31,6 +31,8 @@
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.5.3</surefire-plugin.version>
     <org.jboss.jandex.version>1.2.3</org.jboss.jandex.version>
+    <org.reflection.version>0.10.2</org.reflection.version>
+    <org.assertj.version>3.27.3</org.assertj.version>
 
     <quarkus.test.coverage.enabled>true</quarkus.test.coverage.enabled>
     <sonar.coverage.jacoco.xmlReportPaths>../target/coverage/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
@@ -78,6 +80,14 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-jackson</artifactId>
+    </dependency>
     <!-- Tests -->
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -108,7 +118,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.27.3</version>
+      <version>${org.assertj.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -120,7 +130,7 @@
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.10.2</version>
+      <version>${org.reflection.version}</version>
     </dependency>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>

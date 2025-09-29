@@ -1,19 +1,14 @@
-package fr.revoicechat.core.dev;
-
-import jakarta.ws.rs.core.MediaType;
+package fr.revoicechat.core.web.error;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import fr.revoicechat.core.dev.TestDevOnlyController.DevTestProfile;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.QuarkusTestProfile;
-import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
+import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
-@TestProfile(DevTestProfile.class)
-class TestDevOnlyController {
+class TestErrorThrowController {
 
   @Test
   void testError() {
@@ -39,12 +34,5 @@ class TestDevOnlyController {
                                            "\"message\": \"Problème est survenu de notre côté. Veuillez réessayer plus tard ou contacter l'assistance si le problème persiste.\",",
                                            "\"errorFile\": ",
                                            "\"swaggerDoc\": \"/api/q/swagger-ui\"");
-  }
-
-  public static class DevTestProfile implements QuarkusTestProfile {
-    @Override
-    public String getConfigProfile() {
-      return "dev,test";
-    }
   }
 }

@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>revoicechat-security</artifactId>
+  <name>ReVoiceChat Security</name>
 
   <dependencies>
     <!-- Security -->
