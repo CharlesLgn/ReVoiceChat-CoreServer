@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>revoicechat-i18n</artifactId>
+  <name>ReVoiceChat i18n</name>
 
   <build>
     <plugins>

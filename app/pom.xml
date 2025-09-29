@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>revoicechat-app</artifactId>
-  <name>ReVoiceChat-app</name>
+  <name>ReVoiceChat App</name>
   <description>quarkus app</description>
 
   <dependencies>
@@ -29,16 +29,6 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-orm</artifactId>
-    </dependency>
-
-    <!-- Web -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-jackson</artifactId>
     </dependency>
 
     <dependency>

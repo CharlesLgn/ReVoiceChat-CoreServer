@@ -10,16 +10,9 @@
   </parent>
 
   <artifactId>revoicechat-notification</artifactId>
+  <name>ReVoiceChat Notification</name>
 
   <dependencies>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-jackson</artifactId>
-    </dependency>
     <dependency>
       <groupId>fr.revoicechat</groupId>
       <artifactId>revoicechat-openapi</artifactId>
