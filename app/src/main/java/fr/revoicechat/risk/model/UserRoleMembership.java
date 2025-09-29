@@ -1,5 +1,6 @@
 package fr.revoicechat.risk.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -21,6 +22,11 @@ public class UserRoleMembership {
       joinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "ID"),
       inverseJoinColumns = @JoinColumn(name = "SERVER_ROLE_ID", referencedColumnName = "ID"))
   private List<ServerRoles> serverRoles;
+
+  public UserRoleMembership() {
+    super();
+    setServerRoles(new ArrayList<>());
+  }
 
   public UUID getId() {
     return id;

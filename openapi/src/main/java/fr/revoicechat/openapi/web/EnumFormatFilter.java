@@ -1,4 +1,4 @@
-package fr.revoicechat.core.web.openapi;
+package fr.revoicechat.openapi.web;
 
 import java.util.List;
 import java.util.Optional;
