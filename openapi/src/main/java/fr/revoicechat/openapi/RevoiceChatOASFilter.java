@@ -16,12 +16,17 @@ public class RevoiceChatOASFilter implements OASFilter {
   public final List<OpenAPIFilterer> openAPIFilterers;
 
   public RevoiceChatOASFilter() {
-    this.schemaFilterers = ServiceLoader.load(SchemaFilterer.class).stream()
-                                        .map(ServiceLoader.Provider::get)
-                                        .toList();
-    this.openAPIFilterers = ServiceLoader.load(OpenAPIFilterer.class).stream()
-                                         .map(ServiceLoader.Provider::get)
-                                         .toList();
+    this(ServiceLoader.load(SchemaFilterer.class).stream()
+                      .map(ServiceLoader.Provider::get)
+                      .toList(),
+        ServiceLoader.load(OpenAPIFilterer.class).stream()
+                     .map(ServiceLoader.Provider::get)
+                     .toList());
+  }
+
+  public RevoiceChatOASFilter(final List<SchemaFilterer> schemaFilterers, final List<OpenAPIFilterer> openAPIFilterers) {
+    this.schemaFilterers = schemaFilterers;
+    this.openAPIFilterers = openAPIFilterers;
   }
 
   @Override
