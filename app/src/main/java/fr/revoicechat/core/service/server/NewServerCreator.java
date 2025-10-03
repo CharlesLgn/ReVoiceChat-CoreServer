@@ -29,7 +29,7 @@ public class NewServerCreator {
   @Transactional
   public Server create(Server server) {
     server.setId(UUID.randomUUID());
-    server.setOwner(holder.get());
+    server.setOwner(holder.getOrNull());
     entityManager.persist(server);
     var general = createRoom(server, "General",  RoomType.TEXT);
     var random = createRoom(server, "Random",   RoomType.TEXT);

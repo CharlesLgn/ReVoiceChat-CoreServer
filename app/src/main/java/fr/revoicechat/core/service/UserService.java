@@ -30,6 +30,7 @@ import fr.revoicechat.security.utils.PasswordUtils;
 import fr.revoicechat.core.service.server.ServerProviderService;
 import fr.revoicechat.notification.Notification;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
@@ -45,6 +46,7 @@ public class UserService {
   private final ServerProviderService serverProviderService;
   @ConfigProperty(name = "revoicechat.global.app-only-accessible-by-invitation")
   boolean appOnlyAccessibleByInvitation;
+  @Inject ServerService serverService;
 
   public UserService(EntityManager entityManager,
                      UserRepository userRepository,
@@ -85,6 +87,7 @@ public class UserService {
       invitationLink.setApplier(user);
       entityManager.persist(invitationLink);
     }
+    serverService.joinDefaultServer(user);
     return toRepresentation(user);
   }
 
