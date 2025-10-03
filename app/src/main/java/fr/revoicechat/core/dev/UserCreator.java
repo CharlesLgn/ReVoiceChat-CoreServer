@@ -21,7 +21,7 @@ public class UserCreator {
     this.entityManager = entityManager;
   }
 
-  public void add(String login, String displayName, String mail, UserType type) {
+  public User add(String login, String displayName, String mail, UserType type) {
     var user = new User();
     user.setId(UUID.randomUUID());
     user.setLogin(login);
@@ -31,5 +31,6 @@ public class UserCreator {
     user.setCreatedDate(LocalDateTime.now());
     user.setType(type);
     entityManager.persist(user);
+    return user;
   }
 }

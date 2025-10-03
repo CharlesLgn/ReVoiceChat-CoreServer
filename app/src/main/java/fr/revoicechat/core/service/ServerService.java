@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
-import fr.revoicechat.risk.service.server.ServerFinder;
-import fr.revoicechat.web.error.BadRequestException;
-import fr.revoicechat.web.error.ResourceNotFoundException;
 import fr.revoicechat.core.model.Server;
 import fr.revoicechat.core.model.ServerUser;
 import fr.revoicechat.core.model.User;
@@ -27,11 +27,11 @@ import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.representation.server.ServerUpdateNotification;
 import fr.revoicechat.core.service.server.ServerProviderService;
 import fr.revoicechat.notification.Notification;
+import fr.revoicechat.risk.service.server.ServerFinder;
 import fr.revoicechat.security.UserHolder;
+import fr.revoicechat.web.error.BadRequestException;
+import fr.revoicechat.web.error.ResourceNotFoundException;
 import io.quarkus.security.UnauthorizedException;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 /**
  * Service responsible for managing {@link Server} entities.
@@ -50,6 +50,7 @@ import jakarta.transaction.Transactional;
  */
 @ApplicationScoped
 public class ServerService implements ServerFinder {
+
   private final ServerProviderService serverProviderService;
   private final UserHolder userHolder;
   private final EntityManager entityManager;
@@ -120,6 +121,22 @@ public class ServerService implements ServerFinder {
     serverUser.setUser(userHolder.get());
     entityManager.persist(serverUser);
     return map(server);
+  }
+
+  @Transactional
+  public void joinDefaultServer(User user) {
+    var servers = serverProviderService.getServers();
+    if (servers.size() == 1) {
+      var server = servers.getFirst();
+      ServerUser serverUser = new ServerUser();
+      serverUser.setServer(server);
+      serverUser.setUser(user);
+      entityManager.persist(serverUser);
+      if (server.getOwner() == null) {
+        server.setOwner(user);
+        entityManager.persist(server);
+      }
+    }
   }
 
   @Transactional

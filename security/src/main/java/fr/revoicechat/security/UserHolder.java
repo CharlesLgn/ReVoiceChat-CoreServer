@@ -9,4 +9,12 @@ public interface UserHolder {
   UUID getId();
   AuthenticatedUser get(String jwtToken);
   UUID peekId(String jwtToken);
+
+  default <T extends AuthenticatedUser> T getOrNull() {
+    try {
+      return get();
+    } catch (Exception e) {
+      return null;
+    }
+  }
 }
