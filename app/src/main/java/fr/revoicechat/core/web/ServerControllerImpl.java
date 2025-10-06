@@ -76,7 +76,7 @@ public class ServerControllerImpl implements ServerController {
   }
 
   @Override
-  @RisksMembershipData(risks = "SERVER_STRUCTURE_UPDATE", retriever = ServerIdRetriever.class)
+  @RisksMembershipData(risks = "SERVER_ROOM_UPDATE", retriever = ServerIdRetriever.class)
   public ServerStructure patchStructure(final UUID id, final ServerStructure structure) {
     return serverService.updateStructure(id, structure);
   }

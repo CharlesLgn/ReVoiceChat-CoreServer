@@ -14,7 +14,7 @@ public record RiskCategoryRepresentation(
 ) {
 
   public RiskCategoryRepresentation(final String type, final String title, Set<RiskType> risks) {
-    this(type, title, risks.stream().map(TranslatedRisk::new).toList());
+    this(type, title, risks.stream().sorted().map(TranslatedRisk::new).toList());
   }
 
   @JsonSerialize(using = TranslatedRiskTypeSerializer.class)
