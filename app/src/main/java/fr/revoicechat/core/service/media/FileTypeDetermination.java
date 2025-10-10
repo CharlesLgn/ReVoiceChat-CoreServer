@@ -19,10 +19,38 @@ class FileTypeDetermination {
   }
 
   private enum Extension {
-    PICTURE(FileType.PICTURE, List.of("jpg", "jpeg", "png", "gif", "webp", "avif", "apng", "ico")),
+    // === Images ===
+    PICTURE(FileType.PICTURE, List.of("jpg", "jpeg", "png", "gif", "webp", "avif", "apng", "ico", "bmp", "tiff", "tif", "heic")),
     SVG(FileType.SVG, List.of("svg")),
-    VIDEO(FileType.VIDEO, List.of("mp4", "webm", "ogv", "avi", "mkv")),
+    // === Videos ===
+    VIDEO(FileType.VIDEO, List.of("mp4", "webm", "ogv", "avi", "mkv", "mov", "flv", "wmv", "mpeg", "mpg")),
+    // === Audio ===
+    AUDIO(FileType.AUDIO, List.of("mp3", "wav", "ogg", "flac", "aac", "m4a", "wma", "opus")),
+    // === Documents ===
     PDF(FileType.PDF, List.of("pdf")),
+    TEXT(FileType.TEXT, List.of("txt", "log", "ini", "cfg", "md", "csv", "json", "yaml", "yml", "xml", "toml")),
+    OFFICE(FileType.OFFICE, List.of("doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "odp", "rtf")),
+    // === Archives & Packages ===
+    ARCHIVE(FileType.ARCHIVE, List.of("zip", "rar", "7z", "tar", "gz", "bz2", "xz", "iso")),
+    // === Code & Scripts ===
+    CODE(FileType.CODE, List.of(
+        // Web
+        "html", "htm", "css", "js", "ts", "tsx", "jsx",
+        // Backend / general
+        "java", "kt", "kts", "scala", "groovy", "c", "cpp", "h", "hpp", "cs", "go", "rs", "swift", "dart",
+        // Scripts
+        "py", "rb", "php", "sh", "bat", "ps1",
+        // Config / templates
+        "sql", "jsp", "vue", "svelte"
+    )),
+    // === Fonts ===
+    FONT(FileType.FONT, List.of("ttf", "otf", "woff", "woff2", "eot")),
+    // === 3D / CAD ===
+    MODEL(FileType.MODEL, List.of("obj", "fbx", "stl", "gltf", "glb", "blend", "3ds", "dae")),
+    // === Executables ===
+    EXECUTABLE(FileType.EXECUTABLE, List.of("exe", "msi", "app", "apk", "jar", "bat", "sh", "bin")),
+    // === Data / Database files ===
+    DATA(FileType.DATA, List.of("sql", "db", "sqlite", "mdb", "accdb", "xml", "json", "csv", "parquet", "avro")),
     ;
 
     private final FileType fileType;
