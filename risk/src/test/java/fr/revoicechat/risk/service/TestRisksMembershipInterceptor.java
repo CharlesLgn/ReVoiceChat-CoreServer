@@ -44,6 +44,7 @@ class TestRisksMembershipInterceptor {
   @ApplicationScoped
   static class RisksMembershipInterceptorTestService {
 
+    @SuppressWarnings("unused")
     @RisksMembershipData(risks = "TEST", retriever = ServerIdRetriever.class)
     void test(UUID server) {
       // nothing here

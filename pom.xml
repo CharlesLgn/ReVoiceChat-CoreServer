@@ -168,6 +168,7 @@
             <quarkus.jacoco.reuse-data-file>true</quarkus.jacoco.reuse-data-file>
             <quarkus.jacoco.report-location>${maven.multiModuleProjectDirectory}/target/coverage</quarkus.jacoco.report-location>
           </systemPropertyVariables>
+          <!--suppress UnresolvedMavenProperty -->
           <argLine>${argLine}</argLine>
         </configuration>
       </plugin>
