@@ -45,7 +45,6 @@ public interface SettingsController extends LoggedApi  {
   @Tag(name = "User")
   @Operation(summary = "Update settings of the connected user", description = "Update the settings of the connected user.")
   @APIResponse(responseCode = "200")
-  @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
   @PATCH
   @Path("/me")
