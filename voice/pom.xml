@@ -29,6 +29,10 @@
       <groupId>fr.revoicechat</groupId>
       <artifactId>revoicechat-notification</artifactId>
     </dependency>
+    <dependency>
+      <groupId>fr.revoicechat</groupId>
+      <artifactId>revoicechat-risk</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
