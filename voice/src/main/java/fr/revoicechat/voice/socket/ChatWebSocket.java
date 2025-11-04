@@ -1,5 +1,7 @@
 package fr.revoicechat.voice.socket;
 
+import static fr.revoicechat.voice.risk.VoiceRiskType.*;
+
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
@@ -11,21 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-
-import org.eclipse.microprofile.context.ManagedExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fr.revoicechat.notification.Notification;
-import fr.revoicechat.notification.representation.UserNotificationRepresentation;
-import fr.revoicechat.security.UserHolder;
-import fr.revoicechat.security.model.AuthenticatedUser;
-import fr.revoicechat.voice.notification.VoiceJoiningNotification;
-import fr.revoicechat.voice.notification.VoiceLeavingNotification;
-import fr.revoicechat.voice.service.room.VoiceRoomPredicate;
-import fr.revoicechat.voice.service.user.ConnectedUserRetriever;
-import fr.revoicechat.voice.service.user.VoiceRoomUserFinder;
-import fr.revoicechat.voice.utils.IgnoreExceptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.websocket.CloseReason;
@@ -37,6 +24,23 @@ import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
+
+import org.eclipse.microprofile.context.ManagedExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.revoicechat.notification.Notification;
+import fr.revoicechat.notification.representation.UserNotificationRepresentation;
+import fr.revoicechat.risk.service.RiskService;
+import fr.revoicechat.security.UserHolder;
+import fr.revoicechat.security.model.AuthenticatedUser;
+import fr.revoicechat.voice.notification.VoiceJoiningNotification;
+import fr.revoicechat.voice.notification.VoiceLeavingNotification;
+import fr.revoicechat.voice.service.room.RoomRisksEntityRetriever;
+import fr.revoicechat.voice.service.room.VoiceRoomPredicate;
+import fr.revoicechat.voice.service.user.ConnectedUserRetriever;
+import fr.revoicechat.voice.service.user.VoiceRoomUserFinder;
+import fr.revoicechat.voice.utils.IgnoreExceptions;
 
 @ServerEndpoint("/voice/{roomId}")
 @ApplicationScoped
@@ -52,15 +56,21 @@ public class ChatWebSocket implements ConnectedUserRetriever {
   private final UserHolder userHolder;
   private final VoiceRoomUserFinder roomUserFinder;
   private final VoiceRoomPredicate voiceRoomPredicate;
+  private final RoomRisksEntityRetriever roomRisksEntityRetriever;
+  private final RiskService riskService;
 
-  public ChatWebSocket(ManagedExecutor executor,
-                       UserHolder userHolder,
-                       VoiceRoomUserFinder roomUserFinder,
-                       VoiceRoomPredicate voiceRoomPredicate) {
+  public ChatWebSocket(final ManagedExecutor executor,
+                       final UserHolder userHolder,
+                       final VoiceRoomUserFinder roomUserFinder,
+                       final VoiceRoomPredicate voiceRoomPredicate,
+                       final RoomRisksEntityRetriever roomRisksEntityRetriever,
+                       final RiskService riskService) {
     this.executor = executor;
     this.userHolder = userHolder;
     this.roomUserFinder = roomUserFinder;
     this.voiceRoomPredicate = voiceRoomPredicate;
+    this.roomRisksEntityRetriever = roomRisksEntityRetriever;
+    this.riskService = riskService;
   }
 
   @OnOpen
@@ -95,8 +105,18 @@ public class ChatWebSocket implements ConnectedUserRetriever {
       closeSession(session, CloseCodes.CANNOT_ACCEPT, "Selected room cannot accept websocket chat type");
       return;
     }
+    var riskEntity = roomRisksEntityRetriever.get(roomId);
+    var voiceRisk = new VoiceRisks(
+        riskService.hasRisk(user.getId(), riskEntity, JOIN_VOICE_ROOM),
+        riskService.hasRisk(user.getId(), riskEntity, SEND_IN_VOICE_ROOM),
+        riskService.hasRisk(user.getId(), riskEntity, RECEIVE_IN_VOICE_ROOM)
+    );
+    if (!voiceRisk.join) {
+      closeSession(session, CloseCodes.CANNOT_ACCEPT, "User is not authorized to join voice room");
+      return;
+    }
     LOG.info("WebSocket connected as user {}", user.getId());
-    sessions.add(new UserSession(user.getId(), roomId, session));
+    sessions.add(new UserSession(user.getId(), roomId, voiceRisk, session));
     var data = new VoiceJoiningNotification(new UserNotificationRepresentation(user.getId(), user.getDisplayName()), roomId);
     Notification.of(data).sendTo(roomUserFinder.find(roomId));
   }
@@ -133,8 +153,12 @@ public class ChatWebSocket implements ConnectedUserRetriever {
 
   private void onMessage(Session sender, Consumer<Session> action) {
     var current = getExistingSession(sender);
+    if (current == null || !current.risks.send) {
+      return;
+    }
     sessions.stream()
             .filter(userSession -> userSession.room.equals(current.room))
+            .filter(userSession -> userSession.risks.receive)
             .map(userSession -> userSession.session)
             .filter(session -> !session.getId().equals(sender.getId()))
             .filter(Session::isOpen)
@@ -182,7 +206,8 @@ public class ChatWebSocket implements ConnectedUserRetriever {
                    .map(UserSession::user);
   }
 
-  public record UserSession(UUID user, UUID room, Session session) {}
+  public record UserSession(UUID user, UUID room, VoiceRisks risks, Session session) {}
+  public record VoiceRisks(boolean join, boolean send, boolean receive) {}
 
   private void closeSession(Session session, CloseCodes code, String reason) {
     IgnoreExceptions.run(() -> session.close(new CloseReason(code, reason)));

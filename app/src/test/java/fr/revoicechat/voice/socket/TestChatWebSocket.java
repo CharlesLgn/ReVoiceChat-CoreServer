@@ -40,6 +40,7 @@ class TestChatWebSocket {
     String user1 = RestTestUtils.logNewUser("user1");
     String user2 = RestTestUtils.logNewUser("user2");
     UUID room1 = createRoom(user1, "voice 1", VOICE);
+    RestTestUtils.addAllRiskToAllUser(user1);
     try (var webSocketRoom1User1 = WebSocket.of(room1, user1);
          var webSocketRoom1User2 = WebSocket.of(room1, user2)) {
       await().atMost(20, TimeUnit.SECONDS)
@@ -58,6 +59,7 @@ class TestChatWebSocket {
     String user1 = RestTestUtils.logNewUser("user1");
     String user2 = RestTestUtils.logNewUser("user2");
     UUID room1 = createRoom(user1, "voice 1", VOICE);
+    RestTestUtils.addAllRiskToAllUser(user1);
     try (var webSocketRoom1User1 = WebSocket.of(room1, user1);
          var webSocketRoom1User2 = WebSocket.of(room1, user2)) {
       await().atMost(20, TimeUnit.SECONDS)
