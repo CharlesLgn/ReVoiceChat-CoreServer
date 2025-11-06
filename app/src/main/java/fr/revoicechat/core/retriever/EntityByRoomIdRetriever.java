@@ -2,25 +2,40 @@ package fr.revoicechat.core.retriever;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.persistence.EntityManager;
 
 import fr.revoicechat.core.model.Room;
 import fr.revoicechat.risk.RisksEntityRetriever;
 import fr.revoicechat.risk.technicaldata.RiskEntity;
-import jakarta.enterprise.inject.spi.CDI;
-import jakarta.persistence.EntityManager;
+import fr.revoicechat.voice.service.room.RoomRisksEntityRetriever;
 
-public class EntityByRoomIdRetriever implements RisksEntityRetriever {
+@ApplicationScoped
+public class EntityByRoomIdRetriever implements RisksEntityRetriever, RoomRisksEntityRetriever {
 
   @Override
   public RiskEntity get(final Method method, final List<DataParameter> parameters) {
-    var em = CDI.current().select(EntityManager.class).get();
     return parameters.stream()
                      .map(DataParameter::arg)
                      .filter(UUID.class::isInstance)
+                     .map(UUID.class::cast)
+                     .map(this::get)
                      .findFirst()
-                     .map(id -> em.getReference(Room.class, id))
-                     .map(room -> new RiskEntity(room.getServer().getId(), room.getId()))
                      .orElse(RiskEntity.EMPTY);
+  }
+
+  @Override
+  public RiskEntity get(final UUID roomId) {
+    return Optional.ofNullable(roomId)
+                   .map(id -> getEntityManager().getReference(Room.class, id))
+                   .map(room -> new RiskEntity(room.getServer().getId(), room.getId()))
+                   .orElse(RiskEntity.EMPTY);
+  }
+
+  private static EntityManager getEntityManager() {
+    return CDI.current().select(EntityManager.class).get();
   }
 }

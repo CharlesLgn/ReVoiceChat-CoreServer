@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: revoicechat_core
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server.properties:/app/server.properties
+      - ./jwt:/app/jwt
+    restart: unless-stopped
+    environment:
+      - JAVA_OPTS=-Xmx512m -Xms256m
