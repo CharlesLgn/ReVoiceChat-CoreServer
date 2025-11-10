@@ -3,8 +3,12 @@ package fr.revoicechat.risk.service.server;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 import fr.revoicechat.notification.Notification;
+import fr.revoicechat.notification.representation.NotificationActionType;
 import fr.revoicechat.risk.model.Risk;
 import fr.revoicechat.risk.model.RiskMode;
 import fr.revoicechat.risk.model.ServerRoles;
@@ -17,9 +21,6 @@ import fr.revoicechat.risk.representation.RiskRepresentation;
 import fr.revoicechat.risk.representation.ServerRoleRepresentation;
 import fr.revoicechat.risk.type.RiskType;
 import fr.revoicechat.web.error.ResourceNotFoundException;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class ServerRoleService {
@@ -29,7 +30,10 @@ public class ServerRoleService {
   private final EntityManager entityManager;
   private final ServerFinder serverFinder;
 
-  public ServerRoleService(final RiskRepository riskRepository, final ServerRolesRepository serverRolesRepository, final EntityManager entityManager, final ServerFinder serverFinder) {
+  public ServerRoleService(RiskRepository riskRepository,
+                           ServerRolesRepository serverRolesRepository,
+                           EntityManager entityManager,
+                           ServerFinder serverFinder) {
     this.riskRepository = riskRepository;
     this.serverRolesRepository = serverRolesRepository;
     this.entityManager = entityManager;
@@ -54,8 +58,9 @@ public class ServerRoleService {
     mapBasicAttributes(representation, roles);
     entityManager.persist(roles);
     mapRisks(representation, roles);
-    Notification.of(new NotificationServerRole()).sendTo(serverFinder.findUserForServer(serverId));
-    return mapToRepresentation(roles);
+    var roleRepresentation = mapToRepresentation(roles);
+    Notification.of(new NotificationServerRole(roleRepresentation, NotificationActionType.ADD)).sendTo(serverFinder.findUserForServer(serverId));
+    return roleRepresentation;
   }
 
   @Transactional
@@ -65,8 +70,9 @@ public class ServerRoleService {
     entityManager.persist(roles);
     riskRepository.getRisks(serverRoleId).forEach(entityManager::remove);
     mapRisks(representation, roles);
-    Notification.of(new NotificationServerRole()).sendTo(serverFinder.findUserForServer(roles.getServer()));
-    return mapToRepresentation(roles);
+    var roleRepresentation = mapToRepresentation(roles);
+    Notification.of(new NotificationServerRole(roleRepresentation, NotificationActionType.MODIFY)).sendTo(serverFinder.findUserForServer(roles.getServer()));
+    return roleRepresentation;
   }
 
   private void mapBasicAttributes(final CreatedServerRoleRepresentation representation, final ServerRoles roles) {
@@ -104,7 +110,7 @@ public class ServerRoleService {
            user.getServerRoles().add(roles);
            entityManager.persist(user);
          });
-    Notification.of(new NotificationServerRole()).sendTo(serverFinder.findUserForServer(roles.getServer()));
+    Notification.of(new NotificationServerRole(mapToRepresentation(roles), NotificationActionType.MODIFY)).sendTo(serverFinder.findUserForServer(roles.getServer()));
   }
 
   private void removeUserToRole(final UUID serverRoleId) {
@@ -128,7 +134,8 @@ public class ServerRoleService {
            user.getServerRoles().remove(roles);
            entityManager.persist(user);
          });
-    Notification.of(new NotificationServerRole()).sendTo(serverFinder.findUserForServer(roles.getServer()));
+    var roleRepresentation = mapToRepresentation(roles);
+    Notification.of(new NotificationServerRole(roleRepresentation, NotificationActionType.MODIFY)).sendTo(serverFinder.findUserForServer(roles.getServer()));
   }
 
   @Transactional
@@ -139,7 +146,8 @@ public class ServerRoleService {
                   .ifPresentOrElse(risk -> updateMode(risk, mode),
                                    () -> newRisk(roles, new RiskRepresentation(type, null, mode))
                   );
-    Notification.of(new NotificationServerRole()).sendTo(serverFinder.findUserForServer(roles.getServer()));
+    var roleRepresentation = mapToRepresentation(roles);
+    Notification.of(new NotificationServerRole(roleRepresentation, NotificationActionType.MODIFY)).sendTo(serverFinder.findUserForServer(roles.getServer()));
   }
 
   private ServerRoles getEntity(final UUID serverRoleId) {
