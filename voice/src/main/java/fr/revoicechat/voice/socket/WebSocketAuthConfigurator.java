@@ -13,10 +13,10 @@ public class WebSocketAuthConfigurator extends ServerEndpointConfig.Configurator
 
   @Override
   public String getNegotiatedSubprotocol(List<String> supported, List<String> requested) {
-    LOG.info("Requested subprotocols: {}", requested);
+    LOG.debug("Requested subprotocols: {}", requested);
     for (String protocol : requested) {
       if (protocol.startsWith("Bearer.")) {
-        LOG.info("Negotiated subprotocol: {}", protocol);
+        LOG.debug("Negotiated subprotocol: {}", protocol);
         return protocol;
       }
     }
