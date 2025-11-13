@@ -73,7 +73,7 @@ class TestUserHolder {
     user.setDisplayName("test-user");
     user.setType(UserType.USER);
     var token = jwtService.generate(user);
-    Assertions.assertThatThrownBy(() -> userHolder.get(token)).isInstanceOf(WebApplicationException.class);
+    Assertions.assertThat(userHolder.get(token)).isNull();
   }
 
   @Test
