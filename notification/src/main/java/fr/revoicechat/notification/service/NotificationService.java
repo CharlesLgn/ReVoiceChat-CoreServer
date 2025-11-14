@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -48,9 +47,16 @@ public class NotificationService implements NotificationRegistry, NotificationSe
     notifyConnection(registrable);
   }
 
+  private void notifyConnection(NotificationRegistrable registrable) {
+    if (getProcessor(registrable.getId()).size() == 1) {
+      LOG.debug("user {} connected", registrable.getId());
+      Notification.of(new UserStatusUpdate(registrable.getId(), registrable.getStatus())).sendTo(getAllUsersExcept(registrable.getId()));
+    }
+  }
+
   @Override
   public void send(Stream<? extends NotificationRegistrable> targetedUsers, NotificationData data) {
-    targetedUsers.forEach(user -> sendAndCloseIfNecessary(data, user));
+    targetedUsers.filter(this::hasSseHolders).forEach(user -> sendAndCloseIfNecessary(data, user));
   }
 
   /**
@@ -71,31 +77,26 @@ public class NotificationService implements NotificationRegistry, NotificationSe
     return ActiveStatus.OFFLINE;
   }
 
-  private void sendAndCloseIfNecessary(final NotificationData notificationData, final NotificationRegistrable user) {
-    var holders = getProcessor(user.getId());
-    var emitters = new HashSet<>(holders);
-    for (SseHolder holder : emitters) {
-      LOG.debug("send message to user {}", user.getId());
-      var sent = holder.send(notificationData);
-      if (!sent) {
-        LOG.debug("sse closed for user {}", user.getId());
+  private boolean hasSseHolders(NotificationRegistrable registrable) {
+    return !getProcessor(registrable.getId()).isEmpty();
+  }
+
+  private void sendAndCloseIfNecessary(NotificationData notificationData, NotificationRegistrable registrable) {
+    var holders = getProcessor(registrable.getId());
+    for (SseHolder holder : new HashSet<>(holders)) {
+      LOG.debug("send message to user {}", registrable.getId());
+      if (!holder.send(notificationData)) {
+        LOG.debug("sse closed for user {}", registrable.getId());
         holders.remove(holder);
       }
     }
-    notifyDisconnection(user, emitters, holders);
+    notifyDisconnection(registrable);
   }
 
-  private void notifyConnection(NotificationRegistrable registrable) {
-    if (getProcessor(registrable.getId()).size() == 1) {
-      LOG.debug("user {} connected", registrable.getId());
-      Notification.of(new UserStatusUpdate(registrable.getId(), registrable.getStatus())).sendTo(getAllUsersExcept(registrable.getId()));
-    }
-  }
-
-  private void notifyDisconnection(NotificationRegistrable registrable, Set<SseHolder> emitters, Collection<SseHolder> holders) {
-    if (!emitters.isEmpty() && holders.isEmpty()) {
+  private void notifyDisconnection(NotificationRegistrable registrable) {
+    if (getProcessor(registrable.getId()).isEmpty()) {
       LOG.debug("user {} disconnected", registrable.getId());
-      Notification.of(new UserStatusUpdate(registrable.getId(), ActiveStatus.ONLINE)).sendTo(getAllUsersExcept(registrable.getId()));
+      Notification.of(new UserStatusUpdate(registrable.getId(), ActiveStatus.OFFLINE)).sendTo(getAllUsersExcept(registrable.getId()));
     }
   }
 
