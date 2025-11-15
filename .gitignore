@@ -45,3 +45,4 @@ latest.log.*.gz
 /**/application-dynamic-*.yml
 
 /jwt
+/**/jwt
