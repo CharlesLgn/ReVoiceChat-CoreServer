@@ -2,10 +2,6 @@ package fr.revoicechat.security.service;
 
 import java.util.UUID;
 
-import jakarta.enterprise.inject.Default;
-import jakarta.inject.Singleton;
-import jakarta.ws.rs.WebApplicationException;
-
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.slf4j.Logger;
@@ -14,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import fr.revoicechat.security.model.AuthenticatedUser;
 import io.smallrye.jwt.auth.principal.JWTParser;
 import io.smallrye.jwt.build.Jwt;
+import jakarta.enterprise.inject.Default;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.WebApplicationException;
 
 @Default
 @Singleton
@@ -21,14 +20,16 @@ public class JwtService implements SecurityTokenService {
   private static final Logger LOG = LoggerFactory.getLogger(JwtService.class);
 
   private final JWTParser jwtParser;
+  private final TokenBlacklistService tokenBlacklistService;
 
   @ConfigProperty(name = "mp.jwt.verify.issuer")
   String jwtIssuer;
   @ConfigProperty(name = "revoicechat.jwt.valid-day", defaultValue = "30")
   int jwtValidDay;
 
-  public JwtService(final JWTParser jwtParser) {
+  public JwtService(JWTParser jwtParser, TokenBlacklistService tokenBlacklistService) {
     this.jwtParser = jwtParser;
+    this.tokenBlacklistService = tokenBlacklistService;
   }
 
   public String generate(final AuthenticatedUser user) {
@@ -49,5 +50,10 @@ public class JwtService implements SecurityTokenService {
     } catch (Exception e) {
       throw new WebApplicationException("Invalid token", 401);
     }
+  }
+
+  @Override
+  public void blackList(final JsonWebToken jsonWebToken) {
+    tokenBlacklistService.blacklistToken(jsonWebToken.getRawToken(), jsonWebToken.getExpirationTime());
   }
 }

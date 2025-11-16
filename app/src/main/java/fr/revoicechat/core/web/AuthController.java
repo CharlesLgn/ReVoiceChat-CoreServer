@@ -1,14 +1,6 @@
 package fr.revoicechat.core.web;
 
-import jakarta.annotation.security.PermitAll;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -22,6 +14,17 @@ import fr.revoicechat.core.representation.user.UserRepresentation;
 import fr.revoicechat.core.service.UserService;
 import fr.revoicechat.security.service.SecurityTokenService;
 import fr.revoicechat.security.utils.PasswordUtils;
+import io.quarkus.security.identity.SecurityIdentity;
+import jakarta.annotation.security.PermitAll;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 @Path("/auth")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -29,10 +32,14 @@ import fr.revoicechat.security.utils.PasswordUtils;
 public class AuthController {
 
   private final UserService userService;
+  private final SecurityIdentity securityIdentity;
   private final SecurityTokenService securityTokenService;
 
-  public AuthController(final UserService userService, final SecurityTokenService securityTokenService) {
+  public AuthController(UserService userService,
+                        SecurityIdentity securityIdentity,
+                        SecurityTokenService securityTokenService) {
     this.userService = userService;
+    this.securityIdentity = securityIdentity;
     this.securityTokenService = securityTokenService;
   }
 
@@ -74,6 +81,21 @@ public class AuthController {
       return Response.ok(securityTokenService.generate(user)).build();
     } else {
       return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid credentials").build();
+    }
+  }
+
+  @Operation(summary = "Log out")
+  @APIResponse(responseCode = "200", description = "User successfully logged out")
+  @GET
+  @PermitAll
+  @Path("/logout")
+  @Produces(MediaType.TEXT_PLAIN)
+  public Response logout() {
+    if (securityIdentity.getPrincipal() instanceof JsonWebToken jsonWebToken) {
+      securityTokenService.blackList(jsonWebToken);
+      return Response.ok().build();
+    } else {
+      return Response.status(Status.NO_CONTENT).build();
     }
   }
 }
