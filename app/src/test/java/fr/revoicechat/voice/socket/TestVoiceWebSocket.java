@@ -20,7 +20,7 @@ import fr.revoicechat.core.representation.room.RoomRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.web.tests.RestTestUtils;
 import fr.revoicechat.security.service.SecurityTokenService;
-import fr.revoicechat.voice.socket.chat.ChatWebSocket;
+import fr.revoicechat.voice.socket.voice.VoiceWebSocket;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
@@ -33,7 +33,7 @@ import jakarta.ws.rs.core.MediaType;
 @QuarkusTest
 @CleanDatabase
 @TestProfile(MonoServerProfile.class)
-class TestChatWebSocket {
+class TestVoiceWebSocket {
 
   @Inject SecurityTokenService jwtService;
   @Inject EntityManager entityManager;
@@ -203,7 +203,7 @@ class TestChatWebSocket {
     try (var webSocket = WebSocket.of(room1, user1 + "wrongToken")) {
       await().atMost(5, TimeUnit.SECONDS)
              .untilAsserted(() -> {
-               var chatWebSocket = CDI.current().select(ChatWebSocket.class).get();
+               var chatWebSocket = CDI.current().select(VoiceWebSocket.class).get();
                var session = webSocket.session();
                var npe = new NullPointerException("NPE");
                assertThatCode(() -> chatWebSocket.onError(session, npe)).doesNotThrowAnyException();

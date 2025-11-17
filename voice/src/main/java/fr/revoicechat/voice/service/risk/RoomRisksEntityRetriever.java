@@ -1,4 +1,4 @@
-package fr.revoicechat.voice.service.room;
+package fr.revoicechat.voice.service.risk;
 
 import java.util.UUID;
 

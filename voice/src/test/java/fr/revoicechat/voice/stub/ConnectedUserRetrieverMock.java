@@ -12,4 +12,9 @@ public class ConnectedUserRetrieverMock implements ConnectedUserRetriever {
   public Stream<UUID> getConnectedUsers(final UUID room) {
     return Stream.empty();
   }
+
+  @Override
+  public UUID getRoomForUser(final UUID user) {
+    return UUID.randomUUID();
+  }
 }

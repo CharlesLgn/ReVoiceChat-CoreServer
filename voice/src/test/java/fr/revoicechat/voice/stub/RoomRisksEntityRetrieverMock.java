@@ -4,7 +4,7 @@ import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import fr.revoicechat.risk.technicaldata.RiskEntity;
-import fr.revoicechat.voice.service.room.RoomRisksEntityRetriever;
+import fr.revoicechat.voice.service.risk.RoomRisksEntityRetriever;
 
 @ApplicationScoped
 public class RoomRisksEntityRetrieverMock implements RoomRisksEntityRetriever {
