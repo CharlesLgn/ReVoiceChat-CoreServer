@@ -18,13 +18,12 @@ import fr.revoicechat.live.stream.socket.StreamWebSocket;
  *
  * @see StreamWebSocket
  */
-@Path("/ws")
+@Path("/ws/stream")
 @Tag(name = "WebSocket")
 @Produces(MediaType.APPLICATION_JSON)
 public class WsDocResource {
 
   @GET
-  @Path("/stream")
   @Operation(summary = "WebSocket endpoint for voice",
       description = """
           Connect via `ws://*url*/api/voice/{roomId}?token={jwtToken}`.

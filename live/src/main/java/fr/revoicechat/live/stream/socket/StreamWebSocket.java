@@ -1,8 +1,6 @@
 package fr.revoicechat.live.stream.socket;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -62,25 +60,25 @@ import fr.revoicechat.security.UserHolder;
 public class StreamWebSocket {
   private static final Logger LOG = LoggerFactory.getLogger(StreamWebSocket.class);
 
-  // Thread-safe set of connected sessions
-  private static final Set<StreamSession> streams = ConcurrentHashMap.newKeySet();
-
   private final WebSocketService webSocketService;
   private final UserHolder userHolder;
   private final ConnectedUserRetriever connectedUserRetriever;
   private final DiscussionRiskService discussionRiskService;
   private final VoiceRoomUserFinder roomUserFinder;
+  private final StreamSessions streamSessions;
 
   public StreamWebSocket(final WebSocketService webSocketService,
                          final UserHolder userHolder,
                          final ConnectedUserRetriever connectedUserRetriever,
                          final DiscussionRiskService discussionRiskService,
-                         final VoiceRoomUserFinder roomUserFinder) {
+                         final VoiceRoomUserFinder roomUserFinder,
+                         final StreamSessions streamSessions) {
     this.webSocketService = webSocketService;
     this.userHolder = userHolder;
     this.connectedUserRetriever = connectedUserRetriever;
     this.discussionRiskService = discussionRiskService;
     this.roomUserFinder = roomUserFinder;
+    this.streamSessions = streamSessions;
   }
 
   /**
@@ -175,7 +173,7 @@ public class StreamWebSocket {
    * @return stream of viewer sessions that should receive the data
    */
   private Stream<Session> getReceiver(Session sender) {
-    var current = get(sender);
+    var current = streamSessions.get(sender);
     if (current == null || !current.streamer().risks().send()) {
       return Stream.empty();
     }
@@ -200,7 +198,7 @@ public class StreamWebSocket {
   @OnClose
   @SuppressWarnings("unused") // call by websocket listener
   public void onClose(Session session) {
-    var stream = get(session);
+    var stream = streamSessions.get(session);
     if (stream != null) {
       var room = connectedUserRetriever.getRoomForUser(stream.streamer().user());
       webSocketService.closeSession(stream.streamer().user(), session, () -> stopStream(stream, room));
@@ -223,9 +221,9 @@ public class StreamWebSocket {
       webSocketService.closeSession(streamer.session(), CloseCodes.CANNOT_ACCEPT, "User in not allowed to stream in this room");
       return;
     }
-    var stream = get(streamer.user(), streamer.streamName());
+    var stream = streamSessions.get(streamer.user(), streamer.streamName());
     stopStream(stream, roomId);
-    streams.add(new StreamSession(streamer));
+    streamSessions.addSession(new StreamSession(streamer));
     Notification.of(new StreamStart(streamer.user(), streamer.streamName())).sendTo(roomUserFinder.find(roomId));
   }
 
@@ -245,7 +243,7 @@ public class StreamWebSocket {
       webSocketService.closeSession(viewer.session(), CloseCodes.CANNOT_ACCEPT, "User in not allowed to watch a stream in this room");
       return;
     }
-    var stream = get(streamedUserId, streamName);
+    var stream = streamSessions.get(streamedUserId, streamName);
     if (stream == null) {
       webSocketService.closeSession(viewer.session(), CloseCodes.CANNOT_ACCEPT, "No stream found");
       return;
@@ -286,7 +284,7 @@ public class StreamWebSocket {
     if (stream != null) {
       stream.viewers().forEach(this::handleCloseSession);
       handleCloseSession(stream.streamer());
-      streams.remove(stream);
+      streamSessions.removeSession(stream);
       Notification.of(new StreamStop(stream.streamer().user(), stream.streamer().streamName())).sendTo(roomUserFinder.find(roomId));
     }
   }
@@ -301,7 +299,7 @@ public class StreamWebSocket {
    * @return a record containing the stream and viewer, or null if not found
    */
   private ClosingViewer getClosingViewer(final Session session) {
-    for (final StreamSession streamSession : streams) {
+    for (final StreamSession streamSession : streamSessions.getAll()) {
       for (final Viewer viewer : streamSession.viewers()) {
         if (viewer.is(session)) {
           return new ClosingViewer(streamSession, viewer);
@@ -344,32 +342,5 @@ public class StreamWebSocket {
   @SuppressWarnings("unused") // call by websocket listener
   public void onError(Session session, Throwable throwable) {
     webSocketService.onError(session, throwable);
-  }
-
-  /**
-   * Finds a stream session by the streamer's WebSocket session.
-   *
-   * @param session the streamer's WebSocket session
-   * @return the stream session, or null if not found
-   */
-  private StreamSession get(Session session) {
-    return streams.stream()
-                  .filter(e -> e.streamer().is(session))
-                  .findFirst()
-                  .orElse(null);
-  }
-
-  /**
-   * Finds a stream session by streamer ID and stream name.
-   *
-   * @param streamedUserId the streamer's user ID
-   * @param streamName the stream name
-   * @return the stream session, or null if not found
-   */
-  private StreamSession get(UUID streamedUserId, String streamName) {
-    return streams.stream()
-                  .filter(e -> e.streamer().is(streamedUserId, streamName))
-                  .findFirst()
-                  .orElse(null);
   }
 }

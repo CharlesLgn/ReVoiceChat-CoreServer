@@ -14,7 +14,7 @@ class TestWsDocResource {
   @Test
   void test() {
     var result = RestAssured.given().contentType(MediaType.APPLICATION_JSON)
-                            .when().get("/voice")
+                            .when().get("/ws/voice")
                             .then().statusCode(200)
                             .extract().body().asPrettyString();
     Assertions.assertThat(result).isEqualToNormalizingNewlines("""

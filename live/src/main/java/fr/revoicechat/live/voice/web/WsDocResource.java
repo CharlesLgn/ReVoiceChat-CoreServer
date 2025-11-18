@@ -17,13 +17,12 @@ import fr.revoicechat.live.voice.socket.VoiceWebSocket;
  *
  * @see VoiceWebSocket
  */
-@Path("/ws")
+@Path("/ws/voice")
 @Tag(name = "WebSocket")
 @Produces(MediaType.APPLICATION_JSON)
 public class WsDocResource {
 
   @GET
-  @Path("/voice")
   @Operation(summary = "WebSocket endpoint for voice",
       description = """
           Connect via `ws://*url*/api/voice/{roomId}?token={jwtToken}`.
