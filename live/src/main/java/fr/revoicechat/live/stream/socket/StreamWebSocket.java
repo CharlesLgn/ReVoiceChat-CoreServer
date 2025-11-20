@@ -203,7 +203,10 @@ public class StreamWebSocket {
       var room = connectedUserRetriever.getRoomForUser(stream.streamer().user());
       webSocketService.closeSession(stream.streamer().user(), session, () -> stopStream(stream, room));
     } else {
-      leaveStream(session);
+      var closingViewer = getClosingViewer(session);
+      if (closingViewer != null) {
+        webSocketService.closeSession(closingViewer.viewer().user(), session, () -> leaveStream(closingViewer));
+      }
     }
   }
 
@@ -257,18 +260,14 @@ public class StreamWebSocket {
    *
    * <p>Locates the viewer's session, removes them from the stream's viewer list,
    * and notifies room participants that the viewer has left.</p>
-   *
-   * @param session the viewer's session being closed
    */
-  private void leaveStream(final Session session) {
-    var closingViewer = getClosingViewer(session);
-    if (closingViewer != null) {
-      webSocketService.closeSession(closingViewer.viewer().user(), session, () -> handleCloseSession(closingViewer.viewer()));
-      closingViewer.stream().remove(closingViewer.viewer());
-      var streamer = closingViewer.stream().streamer();
-      var room = connectedUserRetriever.getRoomForUser(streamer.user());
-      Notification.of(new StreamLeave(streamer.user(), streamer.streamName(), closingViewer.viewer().user())).sendTo(roomUserFinder.find(room));
-    }
+  @Transactional
+  void leaveStream(ClosingViewer closingViewer) {
+    handleCloseSession(closingViewer.viewer());
+    closingViewer.stream().remove(closingViewer.viewer());
+    var streamer = closingViewer.stream().streamer();
+    var room = connectedUserRetriever.getRoomForUser(streamer.user());
+    Notification.of(new StreamLeave(streamer.user(), streamer.streamName(), closingViewer.viewer().user())).sendTo(roomUserFinder.find(room));
   }
 
   /**
@@ -280,7 +279,8 @@ public class StreamWebSocket {
    * @param stream the stream session to stop
    * @param roomId the room where the stream was happening
    */
-  private void stopStream(StreamSession stream, UUID roomId) {
+  @Transactional
+  void stopStream(StreamSession stream, UUID roomId) {
     if (stream != null) {
       stream.viewers().forEach(this::handleCloseSession);
       handleCloseSession(stream.streamer());
