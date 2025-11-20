@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
@@ -197,15 +198,19 @@ public class StreamWebSocket {
    */
   @OnClose
   @SuppressWarnings("unused") // call by websocket listener
-  public void onClose(Session session) {
+  public void onClose(Session session, CloseReason closeReason) {
     var stream = streamSessions.get(session);
     if (stream != null) {
-      var room = connectedUserRetriever.getRoomForUser(stream.streamer().user());
-      webSocketService.closeSession(stream.streamer().user(), session, () -> stopStream(stream, room));
+      var user = stream.streamer().user();
+      var room = connectedUserRetriever.getRoomForUser(user);
+      webSocketService.closeSession(user, session, () -> stopStream(stream, room));
+      LOG.debug("WebSocket streamer {} closed - Code: {}, Reason: {}", user, closeReason.getCloseCode(), closeReason.getReasonPhrase());
     } else {
       var closingViewer = getClosingViewer(session);
       if (closingViewer != null) {
+        var user = closingViewer.viewer().user();
         webSocketService.closeSession(closingViewer.viewer().user(), session, () -> leaveStream(closingViewer));
+        LOG.debug("WebSocket viewer {} closed - Code: {}, Reason: {}", user, closeReason.getCloseCode(), closeReason.getReasonPhrase());
       }
     }
   }
@@ -224,9 +229,11 @@ public class StreamWebSocket {
       webSocketService.closeSession(streamer.session(), CloseCodes.CANNOT_ACCEPT, "User in not allowed to stream in this room");
       return;
     }
-    var stream = streamSessions.get(streamer.user(), streamer.streamName());
+    var user = streamer.user();
+    var stream = streamSessions.get(user, streamer.streamName());
     stopStream(stream, roomId);
     streamSessions.addSession(new StreamSession(streamer));
+    LOG.info("Streamer connected: {}", user);
     Notification.of(new StreamStart(streamer.user(), streamer.streamName())).sendTo(roomUserFinder.find(roomId));
   }
 
@@ -246,13 +253,15 @@ public class StreamWebSocket {
       webSocketService.closeSession(viewer.session(), CloseCodes.CANNOT_ACCEPT, "User in not allowed to watch a stream in this room");
       return;
     }
+    var user = viewer.user();
     var stream = streamSessions.get(streamedUserId, streamName);
     if (stream == null) {
       webSocketService.closeSession(viewer.session(), CloseCodes.CANNOT_ACCEPT, "No stream found");
       return;
     }
     stream.viewers().add(viewer);
-    Notification.of(new StreamJoin(streamedUserId, streamName, viewer.user())).sendTo(roomUserFinder.find(roomId));
+    LOG.info("Viewer connected: {}", user);
+    Notification.of(new StreamJoin(streamedUserId, streamName, user)).sendTo(roomUserFinder.find(roomId));
   }
 
   /**

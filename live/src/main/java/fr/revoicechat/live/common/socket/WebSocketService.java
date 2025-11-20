@@ -68,7 +68,7 @@ public class WebSocketService {
   }
 
   public void onMessage(Object message, Session sender, Stream<Session> receivers) {
-    LOG.debug("Client {} send : {}", sender.getId(), message);
+    LOG.trace("Client {} send : {}", sender.getId(), message);
     switch (message) {
       case String text   -> onMessage(receivers, text);
       case byte[] binary -> onMessage(receivers, binary);
