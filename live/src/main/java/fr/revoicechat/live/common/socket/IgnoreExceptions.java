@@ -12,7 +12,7 @@ final class IgnoreExceptions {
     try {
       runner.run();
     } catch (Exception e) {
-      LOG.error("Error ", e);
+      LOG.warn(e.getMessage());
     }
   }
 
