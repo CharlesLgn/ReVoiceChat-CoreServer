@@ -5,16 +5,20 @@ import static fr.revoicechat.notification.representation.NotificationActionType.
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
 import fr.revoicechat.core.model.Message;
 import fr.revoicechat.core.repository.MessageRepository;
+import fr.revoicechat.core.representation.emote.EmoteRepresentation;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation;
 import fr.revoicechat.core.representation.message.MessageNotification;
 import fr.revoicechat.core.representation.message.MessageRepresentation;
@@ -158,19 +162,34 @@ public class MessageService {
   }
 
   public MessageRepresentation toRepresentation(final Message message) {
-    var emotes = Stream.of(emoteService.getAll(message.getUser().getId()),
-                           emoteService.getAll(message.getRoom().getServer().getId()))
-                       .flatMap(Collection::stream)
-                       .toList();
     return new MessageRepresentation(
         message.getId(),
         message.getText(),
         message.getRoom().getId(),
         new UserNotificationRepresentation(message.getUser().getId(), message.getUser().getDisplayName()),
         message.getCreatedDate().atOffset(ZoneOffset.UTC),
-        message.getMediaDatas().stream()
-               .map(mediaDataService::toRepresentation).toList(),
-        emotes
+        message.getMediaDatas().stream().map(mediaDataService::toRepresentation).toList(),
+        getEmoteRepresentations(message)
     );
+  }
+
+  private List<EmoteRepresentation> getEmoteRepresentations(final Message message) {
+    Set<String> name = new HashSet<>();
+    List<EmoteRepresentation> emotes = new ArrayList<>();
+    emotes.addAll(distinctEmotes(name, emoteService.getAll(null)));
+    emotes.addAll(distinctEmotes(name, emoteService.getAll(message.getRoom().getServer().getId())));
+    emotes.addAll(distinctEmotes(name, emoteService.getAll(message.getUser().getId())));
+    return emotes;
+  }
+
+  private Collection<EmoteRepresentation> distinctEmotes(final Set<String> name, final List<EmoteRepresentation> all) {
+    Collection<EmoteRepresentation> result = new ArrayList<>();
+    for (EmoteRepresentation representation : all) {
+      if (!name.contains(representation.name())) {
+        result.add(representation);
+        name.add(representation.name());
+      }
+    }
+    return result;
   }
 }
