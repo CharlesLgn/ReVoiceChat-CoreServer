@@ -28,7 +28,7 @@ import jakarta.ws.rs.core.Response.Status;
 
 @Path("/auth")
 @Consumes(MediaType.APPLICATION_JSON)
-@Tag(name = "Authentication", description = "Endpoints for user registration and login")
+@Tag(name = "Authentication", description = "Handle user authentication, registration, and session management")
 public class AuthController {
 
   private final UserService userService;
@@ -43,13 +43,34 @@ public class AuthController {
     this.securityTokenService = securityTokenService;
   }
 
-  @Operation(summary = "Register a new user", description = "Creates a new user account with the provided signup details.")
-  @APIResponse(responseCode = "200", description = "User successfully created",
+  @Operation(
+      summary = "Register new user",
+      description = "Create a new user account with the provided registration details. Upon successful registration, the user can log in using their credentials."
+  )
+  @RequestBody(
+      description = "User registration information including username, password, and optional profile details",
+      content = @Content(schema = @Schema(implementation = SignupRepresentation.class))
+  )
+  @APIResponse(
+      responseCode = "200",
+      description = "User account created successfully",
       content = @Content(schema = @Schema(implementation = UserRepresentation.class))
   )
-  @APIResponse(responseCode = "400",
-      description = "Invalid input data",
-      content = @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class, examples = "Invalid input data"))
+  @APIResponse(
+      responseCode = "400",
+      description = "Invalid registration data or username already exists",
+      content = @Content(
+          mediaType = "text/plain",
+          schema = @Schema(implementation = String.class, examples = "Invalid input data")
+      )
+  )
+  @APIResponse(
+      responseCode = "409",
+      description = "Username or email already in use",
+      content = @Content(
+          mediaType = "text/plain",
+          schema = @Schema(implementation = String.class, examples = "Username already exists")
+      )
   )
   @PUT
   @PermitAll
@@ -59,17 +80,29 @@ public class AuthController {
     return userService.create(user);
   }
 
-  @Operation(summary = "Log in with displayName and password",
-      description = "Authenticates the user with given credentials and creates a session. "
-                    + "Future requests will be authenticated with this session.")
+  @Operation(
+      summary = "User login",
+      description = "Authenticate a user with their username and password. Returns a JWT token that must be included in the Authorization header for subsequent authenticated requests."
+  )
   @RequestBody(
-      description = "The displayName and password of the user",
+      description = "User credentials consisting of username (or display name) and password",
       content = @Content(schema = @Schema(implementation = UserPassword.class))
   )
-  @APIResponse(responseCode = "200", description = "User successfully logged in")
-  @APIResponse(responseCode = "401",
-      description = "Invalid displayName or password",
-      content = @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class, examples = "Invalid displayName or password"))
+  @APIResponse(
+      responseCode = "200",
+      description = "Authentication successful, JWT token returned",
+      content = @Content(
+          mediaType = "text/plain",
+          schema = @Schema(implementation = String.class, examples = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+      )
+  )
+  @APIResponse(
+      responseCode = "401",
+      description = "Authentication failed due to invalid credentials",
+      content = @Content(
+          mediaType = "text/plain",
+          schema = @Schema(implementation = String.class, examples = "Invalid credentials")
+      )
   )
   @POST
   @PermitAll
@@ -84,8 +117,18 @@ public class AuthController {
     }
   }
 
-  @Operation(summary = "Log out")
-  @APIResponse(responseCode = "200", description = "User successfully logged out")
+  @Operation(
+      summary = "User logout",
+      description = "Invalidate the current user session by blacklisting the JWT token. The token will no longer be valid for authentication after this operation."
+  )
+  @APIResponse(
+      responseCode = "200",
+      description = "User logged out successfully and token blacklisted"
+  )
+  @APIResponse(
+      responseCode = "204",
+      description = "No active session to log out"
+  )
   @GET
   @PermitAll
   @Path("/logout")

@@ -1,6 +1,8 @@
 package fr.revoicechat.live.voice.web;
 
 import java.util.Map;
+
+import fr.revoicechat.live.common.web.WebSocketApi;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -8,7 +10,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import fr.revoicechat.live.voice.socket.VoiceWebSocket;
 
@@ -18,9 +19,8 @@ import fr.revoicechat.live.voice.socket.VoiceWebSocket;
  * @see VoiceWebSocket
  */
 @Path("/ws/voice")
-@Tag(name = "WebSocket")
 @Produces(MediaType.APPLICATION_JSON)
-public class WsDocResource {
+public class VoiceWebSocketDocResource implements WebSocketApi {
 
   @GET
   @Operation(summary = "WebSocket endpoint for voice",

@@ -9,7 +9,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 
 @QuarkusTest
-class TestWsDocResource {
+class TestVoiceWebSocketDocResource {
 
   @Test
   void test() {

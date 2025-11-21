@@ -3,15 +3,14 @@ package fr.revoicechat.live.stream.web;
 import java.util.Map;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
+import fr.revoicechat.live.common.web.WebSocketApi;
+import fr.revoicechat.live.stream.socket.StreamWebSocket;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import fr.revoicechat.live.stream.socket.StreamWebSocket;
 
 /**
  * Here for documentation purpose.
@@ -19,9 +18,8 @@ import fr.revoicechat.live.stream.socket.StreamWebSocket;
  * @see StreamWebSocket
  */
 @Path("/ws/stream")
-@Tag(name = "WebSocket")
 @Produces(MediaType.APPLICATION_JSON)
-public class WsDocResource {
+public class StreamWebSocketDocResource implements WebSocketApi {
 
   @GET
   @Operation(summary = "WebSocket endpoint for voice",
