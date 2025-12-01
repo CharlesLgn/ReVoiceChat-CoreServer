@@ -144,7 +144,7 @@ public class ServerService implements ServerFinder {
         server.setOwner(user);
         entityManager.persist(server);
       }
-      Notification.of(new NewUserInServer(server.getId(), user.getId())).sendTo(userRepository.findByServers(id));
+      Notification.of(new NewUserInServer(server.getId(), user.getId())).sendTo(userRepository.findByServers(server.getId()));
     }
   }
 
