@@ -4,7 +4,9 @@ import fr.revoicechat.i18n.LocalizedMessage;
 
 public enum UserErrorCode implements LocalizedMessage {
   USER_NOT_FOUND,
+  USER_LOGIN_INVALID,
   USER_WITH_NO_VALID_INVITATION,
+  USER_PASSWORD_INVALID,
   USER_PASSWORD_WRONG,
   USER_PASSWORD_WRONG_CONFIRMATION,
 }

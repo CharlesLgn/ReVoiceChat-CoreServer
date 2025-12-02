@@ -26,11 +26,13 @@ import fr.revoicechat.core.representation.user.UpdatableUserData;
 import fr.revoicechat.core.representation.user.UpdatableUserData.PasswordUpdated;
 import fr.revoicechat.core.representation.user.UserRepresentation;
 import fr.revoicechat.core.service.server.ServerProviderService;
+import fr.revoicechat.core.service.user.PasswordValidation;
 import fr.revoicechat.notification.Notification;
 import fr.revoicechat.security.UserHolder;
 import fr.revoicechat.security.utils.PasswordUtils;
 import fr.revoicechat.web.error.BadRequestException;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
@@ -46,6 +48,7 @@ public class UserService {
 
   @ConfigProperty(name = "revoicechat.global.app-only-accessible-by-invitation")
   boolean appOnlyAccessibleByInvitation;
+  @Inject PasswordValidation passwordValidation;
 
   public UserService(EntityManager entityManager,
                      UserRepository userRepository,
@@ -70,6 +73,10 @@ public class UserService {
     if (appOnlyAccessibleByInvitation && !isValideInvitation(invitationLink)) {
       throw new BadRequestException(USER_WITH_NO_VALID_INVITATION);
     }
+    if (signer.username() == null || signer.username().isEmpty()) {
+      throw new BadRequestException(USER_LOGIN_INVALID);
+    }
+    passwordValidation.validate(signer.password());
     return generateUser(signer, invitationLink, UserType.USER);
   }
 
