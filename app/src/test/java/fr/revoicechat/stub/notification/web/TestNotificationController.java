@@ -1,4 +1,4 @@
-package fr.revoicechat.notification.web;
+package fr.revoicechat.stub.notification.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;

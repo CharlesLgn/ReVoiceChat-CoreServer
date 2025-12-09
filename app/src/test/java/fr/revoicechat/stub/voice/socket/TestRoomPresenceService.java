@@ -1,4 +1,4 @@
-package fr.revoicechat.voice.socket;
+package fr.revoicechat.stub.voice.socket;
 
 import static org.awaitility.Awaitility.await;
 

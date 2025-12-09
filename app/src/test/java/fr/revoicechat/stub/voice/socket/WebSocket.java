@@ -1,4 +1,4 @@
-package fr.revoicechat.voice.socket;
+package fr.revoicechat.stub.voice.socket;
 
 import java.io.IOException;
 import java.net.URI;

@@ -1,4 +1,4 @@
-package fr.revoicechat.i18n;
+package fr.revoicechat.stub.i18n;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.reflections.Reflections;
 
+import fr.revoicechat.i18n.LocalizedMessage;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest

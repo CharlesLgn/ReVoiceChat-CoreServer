@@ -1,4 +1,4 @@
-package fr.revoicechat.risk.web;
+package fr.revoicechat.stub.risk.web;
 
 import java.util.List;
 import java.util.UUID;

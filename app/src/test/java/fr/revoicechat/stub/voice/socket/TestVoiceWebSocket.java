@@ -1,4 +1,4 @@
-package fr.revoicechat.voice.socket;
+package fr.revoicechat.stub.voice.socket;
 
 import static fr.revoicechat.core.model.RoomType.*;
 import static org.assertj.core.api.Assertions.*;
