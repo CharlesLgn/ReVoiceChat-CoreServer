@@ -70,10 +70,12 @@ Edit `./server.properties` and update `quarkus.datasource.username` and `quarkus
 ### Build the app
  - run `./scripts/build-app.sh`
 
-### Run as an app (.jar)
+### Run server
+
+#### Option A : as an app (.jar)
  - run the `./scripts/run-app.sh`
 
-### Run as a service (systemd)
+#### Option B : As a service (systemd)
 - Copy `rvc-core.service.example` to `rvc-core.service`
 ```sh
 cp rvc-core.service.example rvc-core.service
