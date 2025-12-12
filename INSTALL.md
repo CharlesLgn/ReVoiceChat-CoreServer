@@ -42,7 +42,7 @@ CREATE DATABASE revoicechat_db OWNER = revoicechat_user;
 
 ## Clone this repository (if not already done)
 
-For this guide, we will use `/srv/rvc` but you can use any directory (don't forget to change `/srv/rvc` to your path)
+For this guide, we will use `/srv/rvc` but you can use any directory
 
 ```sh
 git clone https://github.com/revoicechat/ReVoiceChat-CoreServer
@@ -65,37 +65,41 @@ Copy `server.exemple.properties` to `server.properties`
 cp ./server.exemple.properties ./server.properties
 ```
 
-Edit `./server.properties`
-
-```sh
-nano ./server.properties
-```
-
-Edit `quarkus.datasource.username` to the psql username you added earlier
-Add psql password to `quarkus.datasource.password`
+Edit `./server.properties` and update `quarkus.datasource.username` and `quarkus.datasource.password`
 
 ### Build the app
  - run `./scripts/build-app.sh`
- - rename file `revoicechat-app-x.x.x-SNAPSHOT.jar` to `revoicechat.jar` in folder `./app/target/`
 
-### Run as an app (.jar)
- - copy the jar where you want and rename it `revoicechat.jar`
- - copy the `server.properties` in the same place of `revoicechat.jar`
- - run the `java -jar ./revoicechat.jar`
+### Run server
 
-### Run as a service (systemd)
+#### Option A : as an app (.jar)
+ - run the `./scripts/run-app.sh`
+
+#### Option B : As a service (systemd)
 - Copy `rvc-core.service.example` to `rvc-core.service`
-- Edit `rvc-core.service` and change `WorkingDirectory` and `ExecStart` path
-- Link the service file : `sudo systemctl link /[YOUR-PATH]/rvc-core.service`
-- Enable service : `sudo systemctl enable rvc-core.service`
-- Start service : `sudo systemctl start rvc-core.service`
-- Check service status : `sudo systemctl status rvc-core.service`
+```sh
+cp rvc-core.service.example rvc-core.service
+```
+- Link the service file
+```sh
+sudo systemctl link /srv/rvc/ReVoiceChat-CoreServer/rvc-core.service
+```
+- Enable service
+```sh
+sudo systemctl enable rvc-core.service
+```
+- Start service
+```sh
+sudo systemctl start rvc-core.service
+```
+- Check service status
+```sh
+sudo systemctl status rvc-core.service
+```
 
-Expected output : 
+Expected output
 ```log 
 * rvc-core.service - ReVoiceChat Core Server
      Loaded: loaded (/etc/systemd/system/rvc-core.service; enabled; preset: enabled)
      Active: active (running) since Sun 2025-08-24 12:14:11 UTC; 1s ago
 ```
-
-Your CoreServer is now setup !
