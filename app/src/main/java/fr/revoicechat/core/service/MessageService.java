@@ -132,6 +132,7 @@ public class MessageService {
   public MessageRepresentation update(UUID id, CreatedMessageRepresentation creation) {
     var message = getMessage(id);
     message.setText(creation.text());
+    message.setUpdatedDate(OffsetDateTime.now());
     entityManager.persist(message);
     var representation = toRepresentation(message);
     Notification.of(new MessageNotification(representation, MODIFY)).sendTo(roomUserFinder.find(message.getRoom().getId()));
@@ -150,7 +151,7 @@ public class MessageService {
     var message = getMessage(id);
     var room = message.getRoom().getId();
     entityManager.remove(message);
-    var deletedMessage = new MessageNotification(new MessageRepresentation(id, null, room, null, null, null, null), REMOVE);
+    var deletedMessage = new MessageNotification(new MessageRepresentation(id, null, room, null, null, null, null, null), REMOVE);
     Notification.of(deletedMessage).sendTo(roomUserFinder.find(room));
     return id;
   }
@@ -167,6 +168,7 @@ public class MessageService {
         message.getRoom().getId(),
         new UserNotificationRepresentation(message.getUser().getId(), message.getUser().getDisplayName()),
         message.getCreatedDate(),
+        message.getUpdatedDate(),
         message.getMediaDatas().stream().map(mediaDataService::toRepresentation).toList(),
         getEmoteRepresentations(message)
     );

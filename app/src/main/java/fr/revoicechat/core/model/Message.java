@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -23,6 +24,8 @@ public class Message {
   @Column(columnDefinition = "TEXT")
   private String text;
   private OffsetDateTime createdDate;
+  @Nullable
+  private OffsetDateTime updatedDate;
   @ManyToOne
   @JoinColumn(name="ROOM_ID", nullable=false)
   private Room room;
@@ -61,6 +64,15 @@ public class Message {
 
   public void setCreatedDate(final OffsetDateTime createdDate) {
     this.createdDate = createdDate;
+  }
+
+  @Nullable
+  public OffsetDateTime getUpdatedDate() {
+    return updatedDate;
+  }
+
+  public void setUpdatedDate(@Nullable OffsetDateTime updatedDate) {
+    this.updatedDate = updatedDate;
   }
 
   public Room getRoom() {

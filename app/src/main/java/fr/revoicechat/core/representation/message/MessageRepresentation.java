@@ -14,6 +14,7 @@ public record MessageRepresentation(
     UUID roomId,
     UserNotificationRepresentation user,
     OffsetDateTime createdDate,
+    OffsetDateTime updatedDate,
     List<MediaDataRepresentation> medias,
     List<EmoteRepresentation> emotes
 ) {}
