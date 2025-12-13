@@ -1,15 +1,14 @@
 package fr.revoicechat.core.dev;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import fr.revoicechat.core.model.User;
 import fr.revoicechat.core.model.UserType;
+import fr.revoicechat.security.utils.PasswordUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-
-import fr.revoicechat.core.model.User;
-import fr.revoicechat.security.utils.PasswordUtils;
 
 @ApplicationScoped
 @Transactional
@@ -28,7 +27,7 @@ public class UserCreator {
     user.setDisplayName(displayName);
     user.setPassword(PasswordUtils.encodePassword("psw"));
     user.setEmail(mail);
-    user.setCreatedDate(LocalDateTime.now());
+    user.setCreatedDate(OffsetDateTime.now());
     user.setType(type);
     entityManager.persist(user);
     return user;

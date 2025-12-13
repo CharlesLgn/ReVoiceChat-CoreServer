@@ -1,10 +1,11 @@
 package fr.revoicechat.core.model;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -21,7 +22,7 @@ public class Message {
   private UUID id;
   @Column(columnDefinition = "TEXT")
   private String text;
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
   @ManyToOne
   @JoinColumn(name="ROOM_ID", nullable=false)
   private Room room;
@@ -54,11 +55,11 @@ public class Message {
     this.text = text;
   }
 
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(final LocalDateTime createdDate) {
+  public void setCreatedDate(final OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 

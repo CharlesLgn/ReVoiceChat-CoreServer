@@ -3,8 +3,7 @@ package fr.revoicechat.core.service;
 import static fr.revoicechat.core.model.MediaOrigin.ATTACHMENT;
 import static fr.revoicechat.notification.representation.NotificationActionType.*;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -12,9 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 import fr.revoicechat.core.model.Message;
 import fr.revoicechat.core.repository.MessageRepository;
@@ -30,6 +26,9 @@ import fr.revoicechat.notification.Notification;
 import fr.revoicechat.notification.representation.UserNotificationRepresentation;
 import fr.revoicechat.security.UserHolder;
 import fr.revoicechat.web.error.ResourceNotFoundException;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 /**
  * Service layer for managing chat messages within rooms.
@@ -97,7 +96,7 @@ public class MessageService {
     var message = new Message();
     message.setId(UUID.randomUUID());
     message.setText(creation.text());
-    message.setCreatedDate(LocalDateTime.now());
+    message.setCreatedDate(OffsetDateTime.now());
     message.setRoom(room);
     message.setUser(userHolder.get());
     creation.medias().stream().map(data -> mediaDataService.create(data, ATTACHMENT)).forEach(message::addMediaData);
@@ -167,7 +166,7 @@ public class MessageService {
         message.getText(),
         message.getRoom().getId(),
         new UserNotificationRepresentation(message.getUser().getId(), message.getUser().getDisplayName()),
-        message.getCreatedDate().atOffset(ZoneOffset.UTC),
+        message.getCreatedDate(),
         message.getMediaDatas().stream().map(mediaDataService::toRepresentation).toList(),
         getEmoteRepresentations(message)
     );

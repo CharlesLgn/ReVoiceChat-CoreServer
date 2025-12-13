@@ -6,6 +6,7 @@ import static fr.revoicechat.core.nls.UserErrorCode.*;
 import static java.util.function.Predicate.not;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
@@ -85,7 +86,7 @@ public class UserService {
   private UserRepresentation generateUser(SignupRepresentation signer, InvitationLink invitationLink, UserType type) {
     var user = new User();
     user.setId(UUID.randomUUID());
-    user.setCreatedDate(LocalDateTime.now());
+    user.setCreatedDate(OffsetDateTime.now());
     user.setDisplayName(signer.username());
     user.setLogin(signer.username());
     user.setEmail(signer.email());
@@ -179,7 +180,7 @@ public class UserService {
         user.getId(),
         user.getDisplayName(),
         user.getLogin(),
-        user.getCreatedDate().atOffset(ZoneOffset.UTC),
+        user.getCreatedDate(),
         Notification.ping(user),
         user.getType()
     );
