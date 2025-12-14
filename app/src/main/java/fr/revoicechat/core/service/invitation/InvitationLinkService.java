@@ -5,12 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import fr.revoicechat.core.config.SeverAppMode;
-import fr.revoicechat.core.service.server.ServerEntityService;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-
-import fr.revoicechat.web.error.ResourceNotFoundException;
 import fr.revoicechat.core.model.InvitationLink;
 import fr.revoicechat.core.model.InvitationLinkStatus;
 import fr.revoicechat.core.model.InvitationType;
@@ -18,8 +12,12 @@ import fr.revoicechat.core.model.Server;
 import fr.revoicechat.core.model.User;
 import fr.revoicechat.core.repository.InvitationLinkRepository;
 import fr.revoicechat.core.representation.invitation.InvitationRepresentation;
-import fr.revoicechat.core.service.ServerService;
+import fr.revoicechat.core.service.server.ServerEntityService;
 import fr.revoicechat.security.UserHolder;
+import fr.revoicechat.web.error.ResourceNotFoundException;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class InvitationLinkService {

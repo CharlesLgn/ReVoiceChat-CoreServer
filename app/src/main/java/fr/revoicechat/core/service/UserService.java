@@ -5,9 +5,7 @@ import static fr.revoicechat.core.model.InvitationType.APPLICATION_JOIN;
 import static fr.revoicechat.core.nls.UserErrorCode.*;
 import static java.util.function.Predicate.not;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

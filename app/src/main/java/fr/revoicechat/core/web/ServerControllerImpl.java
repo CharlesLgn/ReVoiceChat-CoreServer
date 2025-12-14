@@ -16,6 +16,7 @@ import fr.revoicechat.core.service.RoomService;
 import fr.revoicechat.core.service.ServerService;
 import fr.revoicechat.core.service.UserService;
 import fr.revoicechat.core.service.invitation.InvitationLinkService;
+import fr.revoicechat.core.service.server.ServerStructureService;
 import fr.revoicechat.core.web.api.ServerController;
 import fr.revoicechat.risk.RisksMembershipData;
 import fr.revoicechat.risk.retriever.ServerIdRetriever;
@@ -25,12 +26,14 @@ import jakarta.annotation.security.RolesAllowed;
 public class ServerControllerImpl implements ServerController {
 
   private final ServerService serverService;
+  private final ServerStructureService serverStructureService;
   private final RoomService roomService;
   private final UserService userService;
   private final InvitationLinkService invitationLinkService;
 
-  public ServerControllerImpl(ServerService serverService, RoomService roomService, UserService userService, InvitationLinkService invitationLinkService) {
+  public ServerControllerImpl(ServerService serverService, final ServerStructureService serverStructureService, RoomService roomService, UserService userService, InvitationLinkService invitationLinkService) {
     this.serverService = serverService;
+    this.serverStructureService = serverStructureService;
     this.roomService = roomService;
     this.userService = userService;
     this.invitationLinkService = invitationLinkService;
@@ -70,13 +73,13 @@ public class ServerControllerImpl implements ServerController {
 
   @Override
   public ServerStructure getStructure(final UUID id) {
-    return serverService.getStructure(id);
+    return serverStructureService.getStructure(id);
   }
 
   @Override
   @RisksMembershipData(risks = "SERVER_ROOM_UPDATE", retriever = ServerIdRetriever.class)
   public ServerStructure patchStructure(final UUID id, final ServerStructure structure) {
-    return serverService.updateStructure(id, structure);
+    return serverStructureService.updateStructure(id, structure);
   }
 
   @Override

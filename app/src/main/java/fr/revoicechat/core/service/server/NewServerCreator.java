@@ -9,7 +9,6 @@ import fr.revoicechat.core.model.Server;
 import fr.revoicechat.core.model.server.ServerCategory;
 import fr.revoicechat.core.model.server.ServerRoom;
 import fr.revoicechat.core.model.server.ServerStructure;
-import fr.revoicechat.risk.representation.CreatedServerRoleRepresentation;
 import fr.revoicechat.risk.service.server.ServerRoleDefaultCreator;
 import fr.revoicechat.security.UserHolder;
 import io.quarkus.arc.Unremovable;

@@ -55,8 +55,6 @@ public class ServerService {
   private final ServerRoleService serverRoleService;
   private final UserHolder userHolder;
   private final EntityManager entityManager;
-  private final RoomRepository roomRepository;
-  private final RoomService roomService;
   private final UserRepository userRepository;
 
   public ServerService(final ServerEntityService serverEntityService,
@@ -64,16 +62,12 @@ public class ServerService {
                        final ServerRoleService serverRoleService,
                        final UserHolder userHolder,
                        final EntityManager entityManager,
-                       final RoomRepository roomRepository,
-                       final RoomService roomService,
                        final UserRepository userRepository) {
     this.serverEntityService = serverEntityService;
     this.serverProviderService = serverProviderService;
     this.serverRoleService = serverRoleService;
     this.userHolder = userHolder;
     this.entityManager = entityManager;
-    this.roomRepository = roomRepository;
-    this.roomService = roomService;
     this.userRepository = userRepository;
   }
 
@@ -159,43 +153,11 @@ public class ServerService {
     return updatedServer;
   }
 
-  private ServerRepresentation map(final Server server) {
+  public ServerRepresentation map(final Server server) {
     return new ServerRepresentation(
         server.getId(),
         server.getName(),
         Optional.ofNullable(server.getOwner()).map(User::getId).orElse(null)
     );
-  }
-
-  public ServerStructure getStructure(final UUID id) {
-    return Optional.ofNullable(serverEntityService.getEntity(id).getStructure())
-                   .orElseGet(() -> new ServerStructure(new ArrayList<>(roomService.findAll(id).stream()
-                                                                                   .map(RoomRepresentation::id)
-                                                                                   .map(ServerRoom::new)
-                                                                                   .toList())));
-  }
-
-  @Transactional
-  public ServerStructure updateStructure(final UUID id, final ServerStructure structure) {
-    List<UUID> roomId = structure == null ? List.of() : flatStructure(structure.items(), new ArrayList<>());
-    if (!roomId.isEmpty() && !roomRepository.findIdThatAreNotInRoom(id, roomId).isEmpty()) {
-      throw new BadRequestException(SERVER_STRUCTURE_WITH_ROOM_THAT_DOES_NOT_EXISTS);
-    }
-    var server = serverEntityService.getEntity(id);
-    server.setStructure(structure);
-    entityManager.persist(server);
-    var newStructure = getStructure(id);
-    Notification.of(new ServerUpdateNotification(map(server), MODIFY)).sendTo(userRepository.findByServers(id));
-    return newStructure;
-  }
-
-  private List<UUID> flatStructure(final List<ServerItem> structure, List<UUID> ids) {
-    structure.forEach(item -> {
-      switch (item) {
-        case ServerRoom(UUID id) -> ids.add(id);
-        case ServerCategory category -> flatStructure(category.items(), ids);
-      }
-    });
-    return ids;
   }
 }

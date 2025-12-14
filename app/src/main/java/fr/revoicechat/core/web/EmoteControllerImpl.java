@@ -5,18 +5,16 @@ import static fr.revoicechat.security.utils.RevoiceChatRoles.*;
 import java.util.List;
 import java.util.UUID;
 
-import fr.revoicechat.core.service.server.ServerEntityService;
-import jakarta.annotation.security.RolesAllowed;
-
 import fr.revoicechat.core.representation.emote.CreationEmoteRepresentation;
 import fr.revoicechat.core.representation.emote.EmoteRepresentation;
-import fr.revoicechat.core.service.ServerService;
 import fr.revoicechat.core.service.emote.EmoteRetrieverService;
 import fr.revoicechat.core.service.emote.EmoteUpdaterService;
+import fr.revoicechat.core.service.server.ServerEntityService;
 import fr.revoicechat.core.web.api.EmoteController;
 import fr.revoicechat.risk.RisksMembershipData;
 import fr.revoicechat.risk.retriever.ServerIdRetriever;
 import fr.revoicechat.security.UserHolder;
+import jakarta.annotation.security.RolesAllowed;
 
 public class EmoteControllerImpl implements EmoteController {
 
