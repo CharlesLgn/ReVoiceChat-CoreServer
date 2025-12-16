@@ -83,7 +83,7 @@ public class RestTestUtils {
                       .body().jsonPath().getList(".", UserRepresentation.class);
   }
 
-  private static List<ServerRepresentation> getServers(String token) {
+  public static List<ServerRepresentation> getServers(String token) {
     return RestAssured.given()
                       .contentType(MediaType.APPLICATION_JSON)
                       .header("Authorization", "Bearer " + token)

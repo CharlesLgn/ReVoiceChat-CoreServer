@@ -177,7 +177,7 @@ public class MessageService {
   private List<EmoteRepresentation> getEmoteRepresentations(final Message message) {
     Set<String> name = new HashSet<>();
     List<EmoteRepresentation> emotes = new ArrayList<>();
-    emotes.addAll(distinctEmotes(name, emoteService.getAll(null)));
+    emotes.addAll(distinctEmotes(name, emoteService.getGlobal()));
     emotes.addAll(distinctEmotes(name, emoteService.getAll(message.getRoom().getServer().getId())));
     emotes.addAll(distinctEmotes(name, emoteService.getAll(message.getUser().getId())));
     return emotes;

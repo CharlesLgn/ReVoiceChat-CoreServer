@@ -3,6 +3,7 @@ package fr.revoicechat.core.web;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
@@ -71,6 +72,22 @@ class TestAuthController {
     var response = login("not an existing username", "psw");
     assertThat(response.getStatusCode()).isEqualTo(Status.UNAUTHORIZED.getStatusCode());
     assertThat(response.asString()).isEqualTo("Invalid credentials");
+  }
+
+  @Test
+  void testLogout() {
+    signup();
+    var response = login("testUser", "psw");
+    var token = response.asString();
+    RestAssured.given()
+               .contentType(MediaType.APPLICATION_JSON)
+               .body(token)
+               .when().post("/auth/logout");
+    RestAssured.given()
+               .contentType(MediaType.APPLICATION_JSON)
+               .body(token)
+               .when().get("/user/me")
+               .then().statusCode(Status.UNAUTHORIZED.getStatusCode());
   }
 
   private static Response signup() {

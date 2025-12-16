@@ -47,7 +47,7 @@ public class EmoteControllerImpl implements EmoteController {
   @Override
   @RolesAllowed(ROLE_USER)
   public List<EmoteRepresentation> getGlobalEmotes() {
-    return emoteRetrieverService.getAll(null);
+    return emoteRetrieverService.getGlobal();
   }
 
   @Override

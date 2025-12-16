@@ -49,4 +49,9 @@ public class EmoteRetrieverService {
   public List<EmoteRepresentation> getAll(final UUID id) {
     return emoteRepository.findByEntity(id).map(this::toRepresentation).toList();
   }
+
+  @Transactional
+  public List<EmoteRepresentation> getGlobal() {
+    return emoteRepository.findGlobal().map(this::toRepresentation).toList();
+  }
 }
