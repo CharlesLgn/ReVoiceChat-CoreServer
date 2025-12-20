@@ -291,10 +291,12 @@ public class StreamWebSocket {
   @Transactional
   void stopStream(StreamSession stream, UUID roomId) {
     if (stream != null) {
+      LOG.info("Streamer stopping: {}", stream);
       streamSessions.removeSession(stream);
       stream.viewers().forEach(this::handleCloseSession);
       handleCloseSession(stream.streamer());
       Notification.of(new StreamStop(stream.streamer().user(), stream.streamer().streamName())).sendTo(roomUserFinder.find(roomId));
+      LOG.info("Streamer stop: {}", stream);
     }
   }
 

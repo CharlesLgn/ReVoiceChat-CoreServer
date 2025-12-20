@@ -5,6 +5,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.revoicechat.live.stream.representation.StreamRepresentation;
 import fr.revoicechat.live.stream.service.StreamRetriever;
 import jakarta.inject.Singleton;
@@ -12,6 +15,7 @@ import jakarta.websocket.Session;
 
 @Singleton
 public class StreamSessions implements StreamRetriever {
+  private static final Logger LOG = LoggerFactory.getLogger(StreamSessions.class);
   // Thread-safe set of connected sessions
   private static final Set<StreamSession> streams = ConcurrentHashMap.newKeySet();
 
@@ -24,7 +28,9 @@ public class StreamSessions implements StreamRetriever {
   }
 
   void removeSession(StreamSession session) {
-    streams.remove(session);
+    LOG.info("Stream size before: {}", streams.size());
+    boolean removed = streams.remove(session);
+    LOG.info("Removed: {}, Stream size after: {}", removed, streams.size());
   }
 
   /**

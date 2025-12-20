@@ -1,5 +1,6 @@
 package fr.revoicechat.live.stream.socket;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,5 +27,15 @@ record StreamSession(Streamer streamer, Set<Viewer> viewers) {
         streamer.streamName(),
         viewers.stream().map(Viewer::user).toList()
     );
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    return o instanceof StreamSession that && Objects.equals(streamer, that.streamer);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(streamer);
   }
 }
