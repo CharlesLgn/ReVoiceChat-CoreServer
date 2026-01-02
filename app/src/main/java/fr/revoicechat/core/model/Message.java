@@ -37,6 +37,9 @@ public class Message {
       joinColumns = @JoinColumn(name = "MEASSAGE_ID", referencedColumnName = "ID"),
       inverseJoinColumns = @JoinColumn(name = "MEDIA_ID", referencedColumnName = "ID"))
   private List<MediaData> mediaDatas;
+  @ManyToOne
+  @JoinColumn(name="MESSAGE_ID")
+  private Message answerTo;
 
   public Message() {
     super();
@@ -103,6 +106,14 @@ public class Message {
       this.mediaDatas = new ArrayList<>();
     }
     mediaDatas.add(mediaData);
+  }
+
+  public Message getAnswerTo() {
+    return answerTo;
+  }
+
+  public void setAnswerTo(final Message answerTo) {
+    this.answerTo = answerTo;
   }
 
   @Override

@@ -12,9 +12,18 @@ public record MessageRepresentation(
     UUID id,
     String text,
     UUID roomId,
+    MessageAnsweredRepresentation answeredTo,
     UserNotificationRepresentation user,
     OffsetDateTime createdDate,
     OffsetDateTime updatedDate,
     List<MediaDataRepresentation> medias,
     List<EmoteRepresentation> emotes
-) {}
+) {
+
+  public record MessageAnsweredRepresentation(
+      UUID id,
+      String text,
+      boolean hasMedias,
+      List<EmoteRepresentation> emotes
+  ) {}
+}

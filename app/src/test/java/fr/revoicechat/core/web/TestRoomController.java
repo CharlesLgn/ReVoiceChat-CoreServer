@@ -111,7 +111,7 @@ class TestRoomController {
     PageResult<MessageRepresentation> page = getPage(token, room, 0);
     assertThat(page.content()).isEmpty();
     IntStream.range(0, 13).forEach(i -> {
-      CreatedMessageRepresentation created = new CreatedMessageRepresentation("message " + i, List.of());
+      CreatedMessageRepresentation created = new CreatedMessageRepresentation("message " + i, null, List.of());
       RestAssured.given()
                  .contentType(MediaType.APPLICATION_JSON)
                  .header("Authorization", "Bearer " + token)
@@ -150,7 +150,7 @@ class TestRoomController {
     PageResult<MessageRepresentation> page = getPage(token, room, 0);
     assertThat(page.content()).isEmpty();
     IntStream.range(0, 51).forEach(i -> {
-      CreatedMessageRepresentation created = new CreatedMessageRepresentation("message " + (i < 10 ? "0" : "") + i, List.of());
+      CreatedMessageRepresentation created = new CreatedMessageRepresentation("message " + (i < 10 ? "0" : "") + i, null, List.of());
       RestAssured.given()
                  .contentType(MediaType.APPLICATION_JSON)
                  .header("Authorization", "Bearer " + token)

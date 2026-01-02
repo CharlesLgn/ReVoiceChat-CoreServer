@@ -12,19 +12,19 @@ class TestCreatedMessageRepresentation {
 
   @Test
   void testOnEmptyMessage() {
-    var creation = new CreatedMessageRepresentation("", List.of());
+    var creation = new CreatedMessageRepresentation("", null, List.of());
     Assertions.assertThat(creation.text()).isEmpty();
   }
 
   @Test
   void testOnMessageNull() {
-    var creation = new CreatedMessageRepresentation(null, List.of());
+    var creation = new CreatedMessageRepresentation(null, null, List.of());
     Assertions.assertThat(creation.text()).isEmpty();
   }
 
   @Test
   void test() {
-    var creation = new CreatedMessageRepresentation("  this is a test  ", List.of());
+    var creation = new CreatedMessageRepresentation("  this is a test  ", null, List.of());
     Assertions.assertThat(creation.text()).isEqualTo("this is a test");
   }
 }

@@ -18,6 +18,7 @@ import fr.revoicechat.core.representation.emote.EmoteRepresentation;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation;
 import fr.revoicechat.core.representation.message.MessageNotification;
 import fr.revoicechat.core.representation.message.MessageRepresentation;
+import fr.revoicechat.core.representation.message.MessageRepresentation.MessageAnsweredRepresentation;
 import fr.revoicechat.core.service.emote.EmoteRetrieverService;
 import fr.revoicechat.core.service.media.MediaDataService;
 import fr.revoicechat.core.service.message.MessageValidation;
@@ -91,7 +92,7 @@ public class MessageService {
    */
   @Transactional
   public MessageRepresentation create(UUID roomId, CreatedMessageRepresentation creation) {
-    messageValidation.isValid(creation);
+    messageValidation.isValid(roomId, creation);
     var room = roomService.getRoom(roomId);
     var message = new Message();
     message.setId(UUID.randomUUID());
@@ -131,6 +132,7 @@ public class MessageService {
   @Transactional
   public MessageRepresentation update(UUID id, CreatedMessageRepresentation creation) {
     var message = getMessage(id);
+    messageValidation.isValid(message.getRoom().getId(), creation);
     message.setText(creation.text());
     message.setUpdatedDate(OffsetDateTime.now());
     entityManager.persist(message);
@@ -151,7 +153,7 @@ public class MessageService {
     var message = getMessage(id);
     var room = message.getRoom().getId();
     entityManager.remove(message);
-    var deletedMessage = new MessageNotification(new MessageRepresentation(id, null, room, null, null, null, null, null), REMOVE);
+    var deletedMessage = new MessageNotification(new MessageRepresentation(id, null, room, null, null, null, null, null, null), REMOVE);
     Notification.of(deletedMessage).sendTo(roomUserFinder.find(room));
     return id;
   }
@@ -166,11 +168,24 @@ public class MessageService {
         message.getId(),
         message.getText(),
         message.getRoom().getId(),
+        toAnswerRepresentation(message.getAnswerTo()),
         new UserNotificationRepresentation(message.getUser().getId(), message.getUser().getDisplayName()),
         message.getCreatedDate(),
         message.getUpdatedDate(),
         message.getMediaDatas().stream().map(mediaDataService::toRepresentation).toList(),
         getEmoteRepresentations(message)
+    );
+  }
+
+  private MessageAnsweredRepresentation toAnswerRepresentation(final Message repliedMessage) {
+    if (repliedMessage == null) {
+      return null;
+    }
+    return new MessageAnsweredRepresentation(
+        repliedMessage.getId(),
+        repliedMessage.getText(),
+        !repliedMessage.getMediaDatas().isEmpty(),
+        getEmoteRepresentations(repliedMessage)
     );
   }
 

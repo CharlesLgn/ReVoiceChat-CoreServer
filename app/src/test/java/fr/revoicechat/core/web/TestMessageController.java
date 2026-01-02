@@ -73,7 +73,7 @@ class TestMessageController {
     RestAssured.given()
                .contentType(MediaType.APPLICATION_JSON)
                .header("Authorization", "Bearer " + token)
-               .body(new CreatedMessageRepresentation("message 2", List.of()))
+               .body(new CreatedMessageRepresentation("message 2", null, List.of()))
                .when().pathParam("id", message.id()).patch("/message/{id}")
                .then().statusCode(200);
     PageResult<MessageRepresentation> page2 = getPage(token, room);
@@ -114,7 +114,7 @@ class TestMessageController {
     return RestAssured.given()
                       .contentType(MediaType.APPLICATION_JSON)
                       .header("Authorization", "Bearer " + token)
-                      .body(new CreatedMessageRepresentation("message 1", List.of(new CreatedMediaDataRepresentation("test1.png"),
+                      .body(new CreatedMessageRepresentation("message 1", null, List.of(new CreatedMediaDataRepresentation("test1.png"),
                                                                                   new CreatedMediaDataRepresentation("test2.mp4"))))
                       .when().pathParam("id", room.id()).put("/room/{id}/message")
                       .then().statusCode(200)
