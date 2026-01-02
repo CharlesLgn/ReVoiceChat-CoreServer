@@ -99,6 +99,7 @@ public class MessageService {
     message.setText(creation.text());
     message.setCreatedDate(OffsetDateTime.now());
     message.setRoom(room);
+    message.setAnswerTo(entityManager.find(Message.class, creation.answerTo()));
     message.setUser(userHolder.get());
     creation.medias().stream().map(data -> mediaDataService.create(data, ATTACHMENT)).forEach(message::addMediaData);
     entityManager.persist(message);
