@@ -14,10 +14,13 @@ import fr.revoicechat.core.representation.server.NewUserInServer;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.representation.server.ServerUpdateNotification;
+import fr.revoicechat.core.risk.ServerRiskType;
 import fr.revoicechat.core.service.server.ServerEntityService;
 import fr.revoicechat.core.service.server.ServerProviderService;
 import fr.revoicechat.notification.Notification;
+import fr.revoicechat.risk.service.RiskService;
 import fr.revoicechat.risk.service.server.ServerRoleService;
+import fr.revoicechat.risk.technicaldata.RiskEntity;
 import fr.revoicechat.security.UserHolder;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
@@ -47,19 +50,22 @@ public class ServerService {
   private final UserHolder userHolder;
   private final EntityManager entityManager;
   private final UserRepository userRepository;
+  private final RiskService riskService;
 
   public ServerService(final ServerEntityService serverEntityService,
                        final ServerProviderService serverProviderService,
                        final ServerRoleService serverRoleService,
                        final UserHolder userHolder,
                        final EntityManager entityManager,
-                       final UserRepository userRepository) {
+                       final UserRepository userRepository,
+                       final RiskService riskService) {
     this.serverEntityService = serverEntityService;
     this.serverProviderService = serverProviderService;
     this.serverRoleService = serverRoleService;
     this.userHolder = userHolder;
     this.entityManager = entityManager;
     this.userRepository = userRepository;
+    this.riskService = riskService;
   }
 
   /**
@@ -148,7 +154,8 @@ public class ServerService {
     return new ServerRepresentation(
         server.getId(),
         server.getName(),
-        Optional.ofNullable(server.getOwner()).map(User::getId).orElse(null)
+        Optional.ofNullable(server.getOwner()).map(User::getId).orElse(null),
+        riskService.hasRisk(new RiskEntity(server.getId(), null), ServerRiskType.SERVER_UPDATE)
     );
   }
 }

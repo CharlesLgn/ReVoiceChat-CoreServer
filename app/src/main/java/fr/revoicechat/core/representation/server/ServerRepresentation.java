@@ -5,5 +5,6 @@ import java.util.UUID;
 public record ServerRepresentation(
     UUID id,
     String name,
-    UUID owner
+    UUID owner,
+    boolean canUpdate
 ) {}
