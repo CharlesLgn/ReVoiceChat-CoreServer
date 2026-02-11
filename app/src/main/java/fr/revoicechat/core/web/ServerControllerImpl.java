@@ -1,6 +1,6 @@
 package fr.revoicechat.core.web;
 
-import static fr.revoicechat.security.utils.RevoiceChatRoles.ROLE_USER;
+import static fr.revoicechat.security.utils.RevoiceChatRoles.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +22,6 @@ import fr.revoicechat.risk.RisksMembershipData;
 import fr.revoicechat.risk.retriever.ServerIdRetriever;
 import jakarta.annotation.security.RolesAllowed;
 
-@RolesAllowed(ROLE_USER)
 public class ServerControllerImpl implements ServerController {
 
   private final ServerService serverService;
@@ -40,66 +39,78 @@ public class ServerControllerImpl implements ServerController {
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   public List<ServerRepresentation> getServers() {
     return serverService.getAll();
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   public ServerRepresentation getServer(UUID id) {
     return serverService.get(id);
   }
 
   @Override
+  @RolesAllowed(ROLE_ADMIN)
   public ServerRepresentation createServer(ServerCreationRepresentation representation) {
     return serverService.create(representation);
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   @RisksMembershipData(risks = "SERVER_UPDATE", retriever = ServerIdRetriever.class)
   public ServerRepresentation updateServer(UUID id, ServerCreationRepresentation representation) {
     return serverService.update(id, representation);
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   @RisksMembershipData(risks = "SERVER_DELETE", retriever = ServerIdRetriever.class)
   public void deleteServer(final UUID id) {
     serverService.delete(id);
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   public List<RoomRepresentation> getRooms(UUID id) {
     return roomService.findAllForCurrentUser(id);
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   public ServerStructure getStructure(final UUID id) {
     return serverStructureService.getStructure(id);
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   @RisksMembershipData(risks = "SERVER_ROOM_UPDATE", retriever = ServerIdRetriever.class)
   public ServerStructure patchStructure(final UUID id, final ServerStructure structure) {
     return serverStructureService.updateStructure(id, structure);
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   @RisksMembershipData(risks = "SERVER_ROOM_ADD", retriever = ServerIdRetriever.class)
   public RoomRepresentation createRoom(UUID id, CreationRoomRepresentation representation) {
     return roomService.create(id, representation);
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   public List<UserRepresentation> fetchUsers(final UUID id) {
     return userService.fetchUserForServer(id);
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   @RisksMembershipData(risks = "SERVER_INVITATION_ADD", retriever = ServerIdRetriever.class)
   public InvitationRepresentation generateServerInvitation(final UUID id) {
     return invitationLinkService.generateServerInvitation(id);
   }
 
   @Override
+  @RolesAllowed(ROLE_USER)
   @RisksMembershipData(risks = "SERVER_INVITATION_FETCH", retriever = ServerIdRetriever.class)
   public List<InvitationRepresentation> getAllServerInvitations(final UUID id) {
     return invitationLinkService.getAllServerInvitations(id);
