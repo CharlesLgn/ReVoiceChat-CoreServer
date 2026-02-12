@@ -13,8 +13,8 @@ import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 
-@Path("/profil")
-@Tag(name = "Profil Picture", description = "Manage Profil picture of a user or a server")
+@Path("/profile")
+@Tag(name = "Profile Picture", description = "Manage Profil picture of a user or a server")
 public interface ProfilPictureController extends LoggedApi {
 
   @Operation(summary = "Emmit a sse message to trigger profil picture modification")
