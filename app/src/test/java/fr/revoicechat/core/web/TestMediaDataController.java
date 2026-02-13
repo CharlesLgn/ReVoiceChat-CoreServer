@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import fr.revoicechat.core.junit.CleanDatabase;
 import fr.revoicechat.core.model.MediaDataStatus;
 import fr.revoicechat.core.model.RoomType;
+import fr.revoicechat.core.model.ServerType;
 import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
 import fr.revoicechat.core.representation.media.CreatedMediaDataRepresentation;
 import fr.revoicechat.core.representation.media.MediaDataRepresentation;
@@ -144,7 +145,7 @@ class TestMediaDataController {
   }
 
   private static ServerRepresentation createServer(String token) {
-    var representation = new ServerCreationRepresentation("test");
+    var representation = new ServerCreationRepresentation("test", ServerType.PUBLIC);
     return RestAssured.given()
                       .contentType(MediaType.APPLICATION_JSON)
                       .header("Authorization", "Bearer " + token)

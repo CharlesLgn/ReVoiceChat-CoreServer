@@ -43,6 +43,24 @@ public interface ServerController extends LoggedApi {
   List<ServerRepresentation> getServers();
 
   @Operation(
+      summary = "Get all servers",
+      description = "Retrieve a list of all servers the authenticated user has access to."
+  )
+  @APIResponse(responseCode = "200", description = "Server list retrieved successfully")
+  @GET
+  @Path("all")
+  List<ServerRepresentation> getAllServers();
+
+  @Operation(
+      summary = "Get all servers",
+      description = "Retrieve a list of all servers the authenticated user has access to."
+  )
+  @APIResponse(responseCode = "200", description = "Server list retrieved successfully")
+  @GET
+  @Path("/discover")
+  List<ServerRepresentation> getPublicServers();
+
+  @Operation(
       summary = "Get server by ID",
       description = "Retrieve detailed information about a specific server. Users must have access to the server to view its details."
   )

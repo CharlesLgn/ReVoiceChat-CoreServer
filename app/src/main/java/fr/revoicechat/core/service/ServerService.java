@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import fr.revoicechat.core.model.Server;
+import fr.revoicechat.core.model.ServerType;
 import fr.revoicechat.core.model.ServerUser;
 import fr.revoicechat.core.model.User;
 import fr.revoicechat.core.repository.UserRepository;
@@ -38,8 +39,6 @@ import jakarta.transaction.Transactional;
  *     <li>Update existing servers</li>
  * </ul>
  * <p>
- * The list of servers returned by {@link #getAll()} comes from {@link ServerProviderService},
- * whereas other CRUD operations.
  */
 @ApplicationScoped
 public class ServerService {
@@ -100,6 +99,7 @@ public class ServerService {
   public ServerRepresentation create(final ServerCreationRepresentation representation) {
     Server server = new Server();
     server.setName(representation.name());
+    server.setType(Optional.ofNullable(representation.serverType()).orElse(ServerType.PUBLIC));
     serverProviderService.create(server);
     ServerUser serverUser = new ServerUser();
     serverUser.setServer(server);

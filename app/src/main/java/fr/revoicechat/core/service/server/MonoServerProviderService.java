@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.revoicechat.core.model.Server;
+import fr.revoicechat.core.model.ServerType;
 import fr.revoicechat.core.model.User;
 import fr.revoicechat.core.nls.ServerErrorCode;
 import fr.revoicechat.core.repository.ServerRepository;
@@ -78,6 +79,7 @@ public class MonoServerProviderService implements ServerProviderService {
     }
     var server = new Server();
     server.setName("Server");
+    server.setType(ServerType.PUBLIC);
     return List.of(newServerCreator.create(server));
   }
 

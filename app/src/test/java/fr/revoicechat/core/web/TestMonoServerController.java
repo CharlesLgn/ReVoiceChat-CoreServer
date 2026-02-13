@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 import java.util.UUID;
+
+import fr.revoicechat.core.model.ServerType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
 
@@ -34,7 +36,7 @@ class TestMonoServerController {
   @Test
   void creationIsImpossible() {
     String token = RestTestUtils.logNewUser();
-    var representation = new ServerCreationRepresentation("test");
+    var representation = new ServerCreationRepresentation("test", ServerType.PUBLIC);
     var response = RestAssured.given()
                               .contentType(MediaType.APPLICATION_JSON)
                               .header("Authorization", "Bearer " + token)

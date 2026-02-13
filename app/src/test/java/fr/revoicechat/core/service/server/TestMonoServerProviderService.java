@@ -4,6 +4,7 @@ import static fr.revoicechat.core.service.server.MonoServerProviderService.ERROR
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -82,7 +83,17 @@ class TestMonoServerProviderService {
         .hasMessage(ERROR_MESSAGE);
   }
 
-  private record ServerRepositoryMock(long count, List<Server> findAll) implements ServerRepository {}
+  private record ServerRepositoryMock(long count, List<Server> findAll) implements ServerRepository {
+    @Override
+    public Stream<Server> getByUser(final User user) {
+      return Stream.empty();
+    }
+
+    @Override
+    public Stream<Server> getPublicServer() {
+      return Stream.empty();
+    }
+  }
 
   private static class NewServerCreatorMock extends NewServerCreator {
     private boolean called = false;

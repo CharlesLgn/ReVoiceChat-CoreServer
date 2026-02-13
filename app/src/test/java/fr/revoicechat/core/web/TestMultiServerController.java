@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.UUID;
+
+import fr.revoicechat.core.model.ServerType;
 import jakarta.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
@@ -49,7 +51,7 @@ class TestMultiServerController {
     var servers = getServers(token);
     ServerRepresentation server = servers.getFirst();
     assertThat(server.name()).isEqualTo("test");
-    var newName = new ServerCreationRepresentation("new name");
+    var newName = new ServerCreationRepresentation("new name", ServerType.PUBLIC);
     RestAssured.given()
                .contentType(MediaType.APPLICATION_JSON)
                .header("Authorization", "Bearer " + token)
@@ -68,7 +70,7 @@ class TestMultiServerController {
   @Test
   void testUpdateServerButResourceNotFound() {
     String token = RestTestUtils.logNewUser();
-    var newName = new ServerCreationRepresentation("new name");
+    var newName = new ServerCreationRepresentation("new name", ServerType.PUBLIC);
     var randomId = UUID.randomUUID();
     RestAssured.given()
                .contentType(MediaType.APPLICATION_JSON)
@@ -276,7 +278,7 @@ class TestMultiServerController {
   }
 
   private static ServerRepresentation createServer(String token, String name) {
-    var representation = new ServerCreationRepresentation(name);
+    var representation = new ServerCreationRepresentation(name, ServerType.PUBLIC);
     return RestAssured.given()
                       .contentType(MediaType.APPLICATION_JSON)
                       .header("Authorization", "Bearer " + token)

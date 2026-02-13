@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import fr.revoicechat.core.model.Server;
+import fr.revoicechat.core.repository.ServerRepository;
 import fr.revoicechat.risk.service.server.ServerFinder;
 import fr.revoicechat.web.error.ResourceNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;

@@ -3,11 +3,13 @@ package fr.revoicechat.core.service.server;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.model.Server;
+import fr.revoicechat.core.model.User;
 import fr.revoicechat.core.repository.ServerRepository;
 import io.quarkus.test.junit.QuarkusTest;
 
@@ -31,6 +33,16 @@ class TestMultiServerProviderService {
     @Override
     public long count() {
       return 2;
+    }
+
+    @Override
+    public Stream<Server> getByUser(final User user) {
+      return Stream.empty();
+    }
+
+    @Override
+    public Stream<Server> getPublicServer() {
+      return Stream.empty();
     }
   }
 }

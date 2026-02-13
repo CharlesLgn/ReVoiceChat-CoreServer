@@ -16,6 +16,7 @@ import fr.revoicechat.core.service.RoomService;
 import fr.revoicechat.core.service.ServerService;
 import fr.revoicechat.core.service.UserService;
 import fr.revoicechat.core.service.invitation.InvitationLinkService;
+import fr.revoicechat.core.service.server.ServerRetriever;
 import fr.revoicechat.core.service.server.ServerStructureService;
 import fr.revoicechat.core.web.api.ServerController;
 import fr.revoicechat.risk.RisksMembershipData;
@@ -24,13 +25,15 @@ import jakarta.annotation.security.RolesAllowed;
 
 public class ServerControllerImpl implements ServerController {
 
+  private final ServerRetriever serverRetriever;
   private final ServerService serverService;
   private final ServerStructureService serverStructureService;
   private final RoomService roomService;
   private final UserService userService;
   private final InvitationLinkService invitationLinkService;
 
-  public ServerControllerImpl(ServerService serverService, final ServerStructureService serverStructureService, RoomService roomService, UserService userService, InvitationLinkService invitationLinkService) {
+  public ServerControllerImpl(final ServerRetriever serverRetriever, ServerService serverService, final ServerStructureService serverStructureService, RoomService roomService, UserService userService, InvitationLinkService invitationLinkService) {
+    this.serverRetriever = serverRetriever;
     this.serverService = serverService;
     this.serverStructureService = serverStructureService;
     this.roomService = roomService;
@@ -41,7 +44,19 @@ public class ServerControllerImpl implements ServerController {
   @Override
   @RolesAllowed(ROLE_USER)
   public List<ServerRepresentation> getServers() {
+    return serverRetriever.getAllMyServers();
+  }
+
+  @Override
+  @RolesAllowed(ROLE_ADMIN)
+  public List<ServerRepresentation> getAllServers() {
     return serverService.getAll();
+  }
+
+  @Override
+  @RolesAllowed(ROLE_USER)
+  public List<ServerRepresentation> getPublicServers() {
+    return serverRetriever.getAllPublicServers();
   }
 
   @Override
