@@ -150,6 +150,17 @@ public class ServerService {
     return updatedServer;
   }
 
+  @Transactional
+  public ServerRepresentation join(final UUID serverId, final UUID invitationId) {
+    var server = serverEntityService.getEntity(serverId);
+    if (server.isPublic()) {
+
+    } else {
+
+    }
+    return map(server);
+  }
+
   public ServerRepresentation map(final Server server) {
     return new ServerRepresentation(
         server.getId(),

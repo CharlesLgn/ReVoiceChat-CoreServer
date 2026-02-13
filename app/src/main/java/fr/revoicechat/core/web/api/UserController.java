@@ -34,56 +34,30 @@ public interface UserController extends LoggedApi {
   @Path("/me")
   UserRepresentation me();
 
-  @Operation(
-      summary = "Update my profile",
-      description = "Update personal profile information for the currently authenticated user. Only non-null fields will be updated."
-  )
+  @Operation(summary = "Update my profile", description = "Update personal profile information for the currently authenticated user. Only non-null fields will be updated.")
   @APIResponse(responseCode = "200", description = "User profile updated successfully")
   @APIResponse(responseCode = "400", description = "Invalid user data provided")
   @PATCH
   @Path("/me")
   UserRepresentation updateMe(UpdatableUserData userData);
 
-  @Operation(
-      summary = "Get user by ID",
-      description = "Retrieve the profile information for a specific user. Some fields may be hidden based on privacy settings."
-  )
+  @Operation(summary = "Get user by ID", description = "Retrieve the profile information for a specific user. Some fields may be hidden based on privacy settings.")
   @APIResponse(responseCode = "200", description = "User profile retrieved successfully")
-  @APIResponse(
-      responseCode = "404",
-      description = "User not found",
-      content = @Content(
-          mediaType = "text/plain",
-          schema = @Schema(implementation = String.class, examples = "User not found")
-      )
-  )
+  @APIResponse(responseCode = "404", description = "User not found")
   @GET
   @Path("/{id}")
   UserRepresentation get(@PathParam("id") UUID id);
 
-  @Operation(
-      summary = "Update user (admin)",
-      description = "Update specific properties of any user profile. This endpoint is restricted to administrators and allows updating display name and user type (USER/BOT/ADMIN)."
-  )
+  @Operation(summary = "Update user (admin)", description = "Update specific properties of any user profile. This endpoint is restricted to administrators and allows updating display name and user type (USER/BOT/ADMIN).")
   @APIResponse(responseCode = "200", description = "User profile updated successfully")
   @APIResponse(responseCode = "400", description = "Invalid user data provided")
   @APIResponse(responseCode = "403", description = "Insufficient permissions to update this user")
-  @APIResponse(
-      responseCode = "404",
-      description = "User not found",
-      content = @Content(
-          mediaType = "text/plain",
-          schema = @Schema(implementation = String.class, examples = "User not found")
-      )
-  )
+  @APIResponse(responseCode = "404", description = "User not found")
   @PATCH
   @Path("/{id}")
   UserRepresentation updateAsAdmin(@PathParam("id") UUID id, AdminUpdatableUserData userData);
 
-  @Operation(
-      summary = "Get all users",
-      description = "Retrieve a list of all users in the application. This endpoint may be restricted based on user permissions."
-  )
+  @Operation(summary = "Get all users", description = "Retrieve a list of all users in the application. This endpoint may be restricted based on user permissions.")
   @APIResponse(responseCode = "200", description = "User list retrieved successfully")
   @APIResponse(responseCode = "403", description = "Insufficient permissions to view all users")
   @GET

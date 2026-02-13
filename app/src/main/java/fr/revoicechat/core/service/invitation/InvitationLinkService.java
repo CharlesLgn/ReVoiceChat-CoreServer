@@ -69,8 +69,14 @@ public class InvitationLinkService {
     return new InvitationRepresentation(invitation.getId(), invitation.getStatus(), invitation.getType(), serverId);
   }
 
+  public InvitationLink getEntity(final UUID invitationId) {
+    return Optional.ofNullable(invitationId)
+                   .map(id -> entityManager.find(InvitationLink.class, id))
+                   .orElse(null);
+  }
+
   public InvitationRepresentation get(final UUID id) {
-    var link = entityManager.find(InvitationLink.class, id);
+    var link = getEntity(id);
     if (link == null) {
       throw new ResourceNotFoundException(InvitationLink.class, id);
     }

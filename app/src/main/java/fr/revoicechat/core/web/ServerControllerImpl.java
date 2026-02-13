@@ -16,6 +16,7 @@ import fr.revoicechat.core.service.RoomService;
 import fr.revoicechat.core.service.ServerService;
 import fr.revoicechat.core.service.UserService;
 import fr.revoicechat.core.service.invitation.InvitationLinkService;
+import fr.revoicechat.core.service.server.ServerJoiner;
 import fr.revoicechat.core.service.server.ServerRetriever;
 import fr.revoicechat.core.service.server.ServerStructureService;
 import fr.revoicechat.core.web.api.ServerController;
@@ -31,14 +32,16 @@ public class ServerControllerImpl implements ServerController {
   private final RoomService roomService;
   private final UserService userService;
   private final InvitationLinkService invitationLinkService;
+  private final ServerJoiner serverJoiner;
 
-  public ServerControllerImpl(final ServerRetriever serverRetriever, ServerService serverService, final ServerStructureService serverStructureService, RoomService roomService, UserService userService, InvitationLinkService invitationLinkService) {
+  public ServerControllerImpl(final ServerRetriever serverRetriever, ServerService serverService, final ServerStructureService serverStructureService, RoomService roomService, UserService userService, InvitationLinkService invitationLinkService, final ServerJoiner serverJoiner) {
     this.serverRetriever = serverRetriever;
     this.serverService = serverService;
     this.serverStructureService = serverStructureService;
     this.roomService = roomService;
     this.userService = userService;
     this.invitationLinkService = invitationLinkService;
+    this.serverJoiner = serverJoiner;
   }
 
   @Override
@@ -129,5 +132,11 @@ public class ServerControllerImpl implements ServerController {
   @RisksMembershipData(risks = "SERVER_INVITATION_FETCH", retriever = ServerIdRetriever.class)
   public List<InvitationRepresentation> getAllServerInvitations(final UUID id) {
     return invitationLinkService.getAllServerInvitations(id);
+  }
+
+  @Override
+  @RolesAllowed(ROLE_USER)
+  public void join(final UUID serverId, final UUID invitationId) {
+    serverJoiner.join(serverId, invitationId);
   }
 }
