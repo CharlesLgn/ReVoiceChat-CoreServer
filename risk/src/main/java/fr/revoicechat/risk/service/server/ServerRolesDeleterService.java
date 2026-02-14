@@ -25,7 +25,7 @@ public class ServerRolesDeleterService {
   public void delete(UUID serverId) {
     riskRepository.getRisks(serverId).forEach(entityManager::remove);
     serverRolesRepository.getByServer(serverId).forEach(roles -> {
-      roles.getUsers().forEach(entityManager::remove);
+      serverRolesRepository.deleteMembership(roles);
       entityManager.remove(roles);
     });
   }

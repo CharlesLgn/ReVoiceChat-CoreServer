@@ -23,5 +23,7 @@ public interface ServerRolesRepository {
 
   List<UUID> getMembers(UUID server);
 
+  void deleteMembership(ServerRoles roles);
+
   record AffectedRisk(UUID role, RiskMode mode) {}
 }

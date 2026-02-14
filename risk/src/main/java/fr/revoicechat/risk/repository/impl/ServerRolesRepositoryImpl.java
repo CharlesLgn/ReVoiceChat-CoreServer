@@ -90,4 +90,13 @@ public class ServerRolesRepositoryImpl implements ServerRolesRepository {
                         .setParameter(SERVER_ID, server)
                         .getResultList();
   }
+
+  @Override
+  public void deleteMembership(final ServerRoles roles) {
+    entityManager.createNativeQuery("""
+                     delete from RVC_USER_SERVER_ROLES
+                     where SERVER_ROLE_ID = :serverId""", UUID.class)
+                 .setParameter(SERVER_ID, roles.getId())
+                 .executeUpdate();
+  }
 }
