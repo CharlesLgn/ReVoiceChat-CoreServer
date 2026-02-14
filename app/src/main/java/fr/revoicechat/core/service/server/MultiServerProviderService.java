@@ -1,7 +1,5 @@
 package fr.revoicechat.core.service.server;
 
-import static fr.revoicechat.core.config.SeverAppMode.MULTI_SERVER;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -13,7 +11,6 @@ import fr.revoicechat.core.model.Server;
 import fr.revoicechat.core.model.User;
 import fr.revoicechat.core.repository.ServerRepository;
 import fr.revoicechat.core.repository.UserRepository;
-import io.quarkus.arc.properties.IfBuildProperty;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -23,7 +20,6 @@ import jakarta.enterprise.context.ApplicationScoped;
  * In this mode, any number of {@link Server} instances may exist in the system.
  */
 @ApplicationScoped
-@IfBuildProperty(name = "revoicechat.global.sever-mode", stringValue = MULTI_SERVER)
 public class MultiServerProviderService implements ServerProviderService {
   private static final Logger LOG = LoggerFactory.getLogger(MultiServerProviderService.class);
 

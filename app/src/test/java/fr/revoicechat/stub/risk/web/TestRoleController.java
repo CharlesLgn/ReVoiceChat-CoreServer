@@ -8,15 +8,15 @@ import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.junit.CleanDatabase;
 import fr.revoicechat.core.model.ServerType;
-import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
+import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
+import fr.revoicechat.core.risk.RoomRiskType;
 import fr.revoicechat.core.web.tests.RestTestUtils;
 import fr.revoicechat.risk.model.RiskMode;
 import fr.revoicechat.risk.representation.CreatedServerRoleRepresentation;
 import fr.revoicechat.risk.representation.RiskRepresentation;
 import fr.revoicechat.risk.representation.ServerRoleRepresentation;
-import fr.revoicechat.core.risk.RoomRiskType;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
@@ -24,7 +24,7 @@ import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
 @CleanDatabase
-@TestProfile(MultiServerProfile.class)
+@TestProfile(BasicIntegrationTestProfile.class)
 class TestRoleController {
 
   @Test

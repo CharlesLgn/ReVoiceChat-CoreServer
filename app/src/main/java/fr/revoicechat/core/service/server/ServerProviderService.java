@@ -12,10 +12,7 @@ import fr.revoicechat.core.model.User;
  * <p>
  * Implementations determine whether the application is running in a mode that supports their
  * behavior and can return the list of servers accordingly.
- * <ul>
- *     <li>{@link MonoServerProviderService} — Single-server mode</li>
- *     <li>{@link MultiServerProviderService} — Multi-server mode</li>
- * </ul>
+ * @see MultiServerProviderService
  */
 public interface ServerProviderService {
 

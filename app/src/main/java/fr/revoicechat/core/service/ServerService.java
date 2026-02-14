@@ -11,7 +11,6 @@ import fr.revoicechat.core.model.ServerType;
 import fr.revoicechat.core.model.ServerUser;
 import fr.revoicechat.core.model.User;
 import fr.revoicechat.core.repository.UserRepository;
-import fr.revoicechat.core.representation.server.NewUserInServer;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.representation.server.ServerUpdateNotification;
@@ -20,7 +19,6 @@ import fr.revoicechat.core.service.server.ServerEntityService;
 import fr.revoicechat.core.service.server.ServerProviderService;
 import fr.revoicechat.notification.Notification;
 import fr.revoicechat.risk.service.RiskService;
-import fr.revoicechat.risk.service.server.ServerRoleService;
 import fr.revoicechat.risk.technicaldata.RiskEntity;
 import fr.revoicechat.security.UserHolder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -45,7 +43,6 @@ public class ServerService {
 
   private final ServerEntityService serverEntityService;
   private final ServerProviderService serverProviderService;
-  private final ServerRoleService serverRoleService;
   private final UserHolder userHolder;
   private final EntityManager entityManager;
   private final UserRepository userRepository;
@@ -53,14 +50,12 @@ public class ServerService {
 
   public ServerService(final ServerEntityService serverEntityService,
                        final ServerProviderService serverProviderService,
-                       final ServerRoleService serverRoleService,
                        final UserHolder userHolder,
                        final EntityManager entityManager,
                        final UserRepository userRepository,
                        final RiskService riskService) {
     this.serverEntityService = serverEntityService;
     this.serverProviderService = serverProviderService;
-    this.serverRoleService = serverRoleService;
     this.userHolder = userHolder;
     this.entityManager = entityManager;
     this.userRepository = userRepository;
@@ -109,24 +104,6 @@ public class ServerService {
   }
 
   @Transactional
-  public void joinDefaultServer(User user) {
-    var servers = serverProviderService.getServers();
-    if (servers.size() == 1) {
-      var server = servers.getFirst();
-      ServerUser serverUser = new ServerUser();
-      serverUser.setServer(server);
-      serverUser.setUser(user);
-      entityManager.persist(serverUser);
-      if (server.getOwner() == null) {
-        server.setOwner(user);
-        entityManager.persist(server);
-      }
-      serverRoleService.addUserToDefaultServerRole(user.getId(), server.getId());
-      Notification.of(new NewUserInServer(server.getId(), user.getId())).sendTo(userRepository.findByServers(server.getId()));
-    }
-  }
-
-  @Transactional
   public void delete(final UUID id) {
     serverProviderService.delete(id);
   }
@@ -148,17 +125,6 @@ public class ServerService {
     var updatedServer = map(server);
     Notification.of(new ServerUpdateNotification(updatedServer, MODIFY)).sendTo(userRepository.findByServers(id));
     return updatedServer;
-  }
-
-  @Transactional
-  public ServerRepresentation join(final UUID serverId, final UUID invitationId) {
-    var server = serverEntityService.getEntity(serverId);
-    if (server.isPublic()) {
-
-    } else {
-
-    }
-    return map(server);
   }
 
   public ServerRepresentation map(final Server server) {

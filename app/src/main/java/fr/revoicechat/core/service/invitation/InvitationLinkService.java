@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import fr.revoicechat.core.config.SeverAppMode;
 import fr.revoicechat.core.model.InvitationLink;
 import fr.revoicechat.core.model.InvitationLinkStatus;
 import fr.revoicechat.core.model.InvitationType;
@@ -20,24 +19,21 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
-public class InvitationLinkService {
+public class InvitationLinkService implements InvitationLinkEntityRetriever, InvitationLinkUsage {
 
   private final UserHolder userHolder;
   private final EntityManager entityManager;
   private final ServerEntityService serverService;
   private final InvitationLinkRepository invitationLinkRepository;
-  private final SeverAppMode severAppMode;
 
   public InvitationLinkService(final UserHolder userHolder,
                                final EntityManager entityManager,
                                final ServerEntityService serverService,
-                               final InvitationLinkRepository invitationLinkRepository,
-                               final SeverAppMode severAppMode) {
+                               final InvitationLinkRepository invitationLinkRepository) {
     this.userHolder = userHolder;
     this.entityManager = entityManager;
     this.serverService = serverService;
     this.invitationLinkRepository = invitationLinkRepository;
-    this.severAppMode = severAppMode;
   }
 
   @Transactional
@@ -54,9 +50,6 @@ public class InvitationLinkService {
 
   @Transactional
   public InvitationRepresentation generateServerInvitation(final UUID serverId) {
-    if (severAppMode.isMonoMode()) {
-      return generateApplicationInvitation();
-    }
     var server = serverService.getEntity(serverId);
     User user = userHolder.get();
     var invitation = new InvitationLink();
@@ -69,6 +62,7 @@ public class InvitationLinkService {
     return new InvitationRepresentation(invitation.getId(), invitation.getStatus(), invitation.getType(), serverId);
   }
 
+  @Override
   public InvitationLink getEntity(final UUID invitationId) {
     return Optional.ofNullable(invitationId)
                    .map(id -> entityManager.find(InvitationLink.class, id))
@@ -93,9 +87,6 @@ public class InvitationLinkService {
   }
 
   public List<InvitationRepresentation> getAllServerInvitations(final UUID id) {
-    if (severAppMode.isMonoMode()) {
-      return getAllApplicationInvitations();
-    }
     return invitationLinkRepository.getAllFromServer(id)
                                    .map(this::toRepresentation)
                                    .toList();
@@ -111,6 +102,22 @@ public class InvitationLinkService {
     return invitationLinkRepository.allApplicationInvitations()
                                    .map(this::toRepresentation)
                                    .toList();
+  }
+
+  @Override
+  @Transactional
+  public void use(final InvitationLink invitationLink) {
+    use(invitationLink, userHolder.get());
+  }
+
+  @Override
+  @Transactional
+  public void use(final InvitationLink invitationLink, final User user) {
+    if (invitationLink != null) {
+      invitationLink.setStatus(InvitationLinkStatus.USED);
+      invitationLink.setApplier(user);
+      entityManager.persist(invitationLink);
+    }
   }
 
   private InvitationRepresentation toRepresentation(final InvitationLink link) {

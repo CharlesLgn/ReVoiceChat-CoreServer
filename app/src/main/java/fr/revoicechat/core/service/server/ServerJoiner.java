@@ -8,9 +8,9 @@ import java.util.UUID;
 
 import fr.revoicechat.core.model.InvitationLink;
 import fr.revoicechat.core.model.Server;
-import fr.revoicechat.core.model.User;
-import fr.revoicechat.core.service.invitation.InvitationLinkService;
-import fr.revoicechat.security.UserHolder;
+import fr.revoicechat.core.service.invitation.InvitationLinkEntityRetriever;
+import fr.revoicechat.core.service.invitation.InvitationLinkUsage;
+import fr.revoicechat.core.service.serveruser.ServerUserService;
 import fr.revoicechat.web.error.BadRequestException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -21,25 +21,28 @@ import jakarta.transaction.Transactional;
 @ApplicationScoped
 public class ServerJoiner {
 
-  private final InvitationLinkService invitationLinkService;
+  private final ServerEntityRetriever serverEntityRetriever;
+  private final InvitationLinkEntityRetriever invitationLinkService;
   private final ServerUserService serverUserService;
-  private final ServerEntityService serverEntityService;
-  private final UserHolder userHolder;
+  private final InvitationLinkUsage invitationLinkUsage;
 
-  public ServerJoiner(final InvitationLinkService invitationLinkService, final ServerUserService serverUserService, final ServerEntityService serverEntityService, final UserHolder userHolder) {
+  public ServerJoiner(ServerEntityRetriever serverEntityRetriever,
+                      InvitationLinkEntityRetriever invitationLinkService,
+                      ServerUserService serverUserService,
+                      InvitationLinkUsage invitationLinkUsage) {
+    this.serverEntityRetriever = serverEntityRetriever;
     this.invitationLinkService = invitationLinkService;
     this.serverUserService = serverUserService;
-    this.serverEntityService = serverEntityService;
-    this.userHolder = userHolder;
+    this.invitationLinkUsage = invitationLinkUsage;
   }
 
   @Transactional
   public void joinPublic(final UUID serverId) {
-    var server = serverEntityService.getEntity(serverId);
+    var server = serverEntityRetriever.getEntity(serverId);
     if (!server.isPublic()) {
       throw new BadRequestException(SERVER_NOT_PUBLIC);
     }
-    join(server);
+    serverUserService.join(server);
   }
 
   @Transactional
@@ -48,12 +51,8 @@ public class ServerJoiner {
     if (!isValideInvitation(invitationLink)) {
       throw new BadRequestException(NO_VALID_INVITATION);
     }
-    join(invitationLink.getTargetedServer());
-  }
-
-  private void join(final Server server) {
-    User user = userHolder.get();
-    serverUserService.join(server, user);
+    serverUserService.join(invitationLink.getTargetedServer());
+    invitationLinkUsage.use(invitationLink);
   }
 
   private static boolean isValideInvitation(InvitationLink invitationLink) {

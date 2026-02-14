@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.junit.CleanDatabase;
-import fr.revoicechat.core.quarkus.profile.MonoServerProfile;
+import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
 import fr.revoicechat.core.representation.emote.CreationEmoteRepresentation;
 import fr.revoicechat.core.representation.emote.EmoteRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
@@ -19,7 +19,7 @@ import jakarta.ws.rs.core.MediaType;
 
 /** @see fr.revoicechat.core.web.api.EmoteController */
 @QuarkusTest
-@TestProfile(MonoServerProfile.class)
+@TestProfile(BasicIntegrationTestProfile.class)
 @CleanDatabase
 class TestEmoteControllerImpl {
 

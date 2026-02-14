@@ -4,11 +4,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import fr.revoicechat.risk.service.RiskCategoryService;
-import jakarta.enterprise.inject.spi.CDI;
-import jakarta.ws.rs.core.MediaType;
-
+import fr.revoicechat.core.model.ServerType;
 import fr.revoicechat.core.representation.login.UserPassword;
+import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.representation.user.SignupRepresentation;
 import fr.revoicechat.core.representation.user.UserRepresentation;
@@ -18,9 +16,11 @@ import fr.revoicechat.risk.representation.RiskCategoryRepresentation;
 import fr.revoicechat.risk.representation.RiskCategoryRepresentation.TranslatedRisk;
 import fr.revoicechat.risk.representation.RiskRepresentation;
 import fr.revoicechat.risk.representation.ServerRoleRepresentation;
-import fr.revoicechat.risk.service.RiskService;
+import fr.revoicechat.risk.service.RiskCategoryService;
 import fr.revoicechat.risk.type.RiskType;
 import io.restassured.RestAssured;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.ws.rs.core.MediaType;
 
 public class RestTestUtils {
 
@@ -31,8 +31,10 @@ public class RestTestUtils {
   }
 
   public static String logNewUser(String user) {
-    RestTestUtils.signup(user, "psw");
-    return RestTestUtils.login(user, "psw");
+    signup(user, "psw");
+    var token = login(user, "psw");
+    joinServer(token);
+    return token;
   }
 
   public static UserRepresentation signup(String user, String password) {
@@ -53,6 +55,30 @@ public class RestTestUtils {
                       .when().post("/auth/login")
                       .then().statusCode(200)
                       .extract().body().asString();
+  }
+
+  private static void joinServer(final String token) {
+    var servers = RestAssured.given()
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .header("Authorization", "Bearer " + token)
+                             .when().get("/server/discover")
+                             .then().statusCode(200)
+                             .extract().body().jsonPath().getList(".", ServerRepresentation.class);
+    if (servers.isEmpty()) {
+      var representation = new ServerCreationRepresentation("test", ServerType.PUBLIC);
+      RestAssured.given()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token)
+                            .body(representation)
+                            .when().put("/server")
+                            .then().statusCode(200);
+    } else {
+      RestAssured.given()
+                 .contentType(MediaType.APPLICATION_JSON)
+                 .header("Authorization", "Bearer " + token)
+                 .when().pathParam("id", servers.getFirst().id()).post("/server/{id}/join")
+                 .then().statusCode(204);
+    }
   }
 
   public static void addAllRiskToAllUser(String tokenAdmin) {

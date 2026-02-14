@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import fr.revoicechat.core.junit.CleanDatabase;
 import fr.revoicechat.core.model.RoomType;
 import fr.revoicechat.core.model.ServerType;
-import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
+import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
 import fr.revoicechat.core.repository.page.PageResult;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation;
 import fr.revoicechat.core.representation.message.MessageRepresentation;
@@ -29,7 +29,7 @@ import io.restassured.RestAssured;
 import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
-@TestProfile(MultiServerProfile.class)
+@TestProfile(BasicIntegrationTestProfile.class)
 @CleanDatabase
 class TestRoomController {
 

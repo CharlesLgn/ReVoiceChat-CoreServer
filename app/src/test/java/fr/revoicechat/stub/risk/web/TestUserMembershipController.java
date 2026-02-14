@@ -2,16 +2,14 @@ package fr.revoicechat.stub.risk.web;
 
 import java.util.List;
 
-import fr.revoicechat.core.model.ServerType;
-import jakarta.ws.rs.core.MediaType;
-
 import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import fr.revoicechat.core.junit.CleanDatabase;
-import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
+import fr.revoicechat.core.model.ServerType;
+import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.web.tests.RestTestUtils;
@@ -23,10 +21,11 @@ import fr.revoicechat.risk.type.RoleRiskType;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
+import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
 @CleanDatabase
-@TestProfile(MultiServerProfile.class)
+@TestProfile(BasicIntegrationTestProfile.class)
 class TestUserMembershipController {
 
   @ParameterizedTest

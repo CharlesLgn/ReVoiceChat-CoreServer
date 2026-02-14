@@ -14,29 +14,27 @@ import fr.revoicechat.core.junit.CleanDatabase;
 import fr.revoicechat.core.model.RoomType;
 import fr.revoicechat.core.model.User;
 import fr.revoicechat.core.model.UserType;
-import fr.revoicechat.core.quarkus.profile.MonoServerProfile;
+import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
 import fr.revoicechat.core.representation.room.CreationRoomRepresentation;
 import fr.revoicechat.core.representation.room.RoomRepresentation;
 import fr.revoicechat.core.representation.server.ServerRepresentation;
 import fr.revoicechat.core.web.tests.RestTestUtils;
-import fr.revoicechat.security.service.SecurityTokenService;
 import fr.revoicechat.live.voice.socket.VoiceWebSocket;
+import fr.revoicechat.security.service.SecurityTokenService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
 import jakarta.enterprise.inject.spi.CDI;
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
 import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
 @CleanDatabase
-@TestProfile(MonoServerProfile.class)
+@TestProfile(BasicIntegrationTestProfile.class)
 class TestVoiceWebSocket {
 
   @Inject SecurityTokenService jwtService;
-  @Inject EntityManager entityManager;
 
   @Test
   void test() throws Exception {

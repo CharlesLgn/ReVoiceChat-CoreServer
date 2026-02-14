@@ -6,18 +6,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.UUID;
 
-import fr.revoicechat.core.model.ServerType;
-import jakarta.ws.rs.core.MediaType;
-
 import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.junit.CleanDatabase;
 import fr.revoicechat.core.model.InvitationLinkStatus;
 import fr.revoicechat.core.model.InvitationType;
+import fr.revoicechat.core.model.ServerType;
 import fr.revoicechat.core.model.server.ServerCategory;
 import fr.revoicechat.core.model.server.ServerRoom;
 import fr.revoicechat.core.model.server.ServerStructure;
-import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
+import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
 import fr.revoicechat.core.representation.invitation.InvitationRepresentation;
 import fr.revoicechat.core.representation.room.RoomRepresentation;
 import fr.revoicechat.core.representation.server.ServerCreationRepresentation;
@@ -27,9 +25,10 @@ import fr.revoicechat.core.web.tests.RestTestUtils;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
+import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
-@TestProfile(MultiServerProfile.class)
+@TestProfile(BasicIntegrationTestProfile.class)
 @CleanDatabase
 class TestMultiServerController {
 
@@ -82,7 +81,8 @@ class TestMultiServerController {
 
   @Test
   void testGetServer() {
-    String token = RestTestUtils.logNewUser();
+    RestTestUtils.signup("user", "psw");
+    String token = RestTestUtils.login("user", "psw");
     assertThat(getServers(token)).isEmpty();
     createServer(token, "test1");
     createServer(token, "test2");
@@ -92,7 +92,8 @@ class TestMultiServerController {
 
   @Test
   void testDeleteServer() {
-    String token = RestTestUtils.logNewUser();
+    RestTestUtils.signup("user", "psw");
+    String token = RestTestUtils.login("user", "psw");
     var server1 = createServer(token, "test1");
     var servers = getServers(token);
     assertThat(servers).hasSize(1);

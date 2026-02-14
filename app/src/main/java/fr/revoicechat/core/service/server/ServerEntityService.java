@@ -4,14 +4,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import fr.revoicechat.core.model.Server;
-import fr.revoicechat.core.repository.ServerRepository;
 import fr.revoicechat.risk.service.server.ServerFinder;
 import fr.revoicechat.web.error.ResourceNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 
 @ApplicationScoped
-public class ServerEntityService implements ServerFinder {
+public class ServerEntityService implements ServerEntityRetriever, ServerFinder {
 
   private final EntityManager entityManager;
 
@@ -24,6 +23,7 @@ public class ServerEntityService implements ServerFinder {
     getEntity(id);
   }
 
+  @Override
   public Server getEntity(final UUID id) {
     return Optional.ofNullable(getEntityOrNull(id))
                    .orElseThrow(() -> new ResourceNotFoundException(Server.class, id));

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.junit.CleanDatabase;
 import fr.revoicechat.core.model.RoomType;
-import fr.revoicechat.core.quarkus.profile.MonoServerProfile;
+import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
 import fr.revoicechat.core.representation.room.CreationRoomRepresentation;
 import fr.revoicechat.core.representation.room.RoomPresence;
 import fr.revoicechat.core.representation.room.RoomRepresentation;
@@ -24,7 +24,7 @@ import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
 @CleanDatabase
-@TestProfile(MonoServerProfile.class)
+@TestProfile(BasicIntegrationTestProfile.class)
 class TestRoomPresenceService {
 
   @Test

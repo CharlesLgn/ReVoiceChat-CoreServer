@@ -4,13 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import fr.revoicechat.core.model.ServerType;
-import fr.revoicechat.core.representation.media.CreatedMediaDataRepresentation;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-import jakarta.ws.rs.core.MediaType;
-
 import org.junit.jupiter.api.Test;
 
 import fr.revoicechat.core.junit.CleanDatabase;
@@ -18,8 +11,10 @@ import fr.revoicechat.core.model.FileType;
 import fr.revoicechat.core.model.MediaData;
 import fr.revoicechat.core.model.MediaDataStatus;
 import fr.revoicechat.core.model.RoomType;
-import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
+import fr.revoicechat.core.model.ServerType;
+import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
 import fr.revoicechat.core.repository.page.PageResult;
+import fr.revoicechat.core.representation.media.CreatedMediaDataRepresentation;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation;
 import fr.revoicechat.core.representation.message.MessageRepresentation;
 import fr.revoicechat.core.representation.room.CreationRoomRepresentation;
@@ -30,10 +25,14 @@ import fr.revoicechat.core.web.tests.RestTestUtils;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.RestAssured;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
 @CleanDatabase
-@TestProfile(MultiServerProfile.class)
+@TestProfile(BasicIntegrationTestProfile.class)
 class TestMessageController {
 
   @Inject EntityManager entityManager;

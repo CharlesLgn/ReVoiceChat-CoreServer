@@ -24,6 +24,9 @@ import fr.revoicechat.core.representation.user.SignupRepresentation;
 import fr.revoicechat.core.representation.user.UpdatableUserData;
 import fr.revoicechat.core.representation.user.UpdatableUserData.PasswordUpdated;
 import fr.revoicechat.core.representation.user.UserRepresentation;
+import fr.revoicechat.core.service.invitation.InvitationLinkService;
+import fr.revoicechat.core.service.invitation.InvitationLinkUsage;
+import fr.revoicechat.core.service.server.ServerJoiner;
 import fr.revoicechat.core.service.server.ServerProviderService;
 import fr.revoicechat.core.service.user.PasswordValidation;
 import fr.revoicechat.notification.Notification;
@@ -42,24 +45,24 @@ public class UserService {
   private final UserRepository userRepository;
   private final UserHolder userHolder;
   private final ServerProviderService serverProviderService;
-  private final ServerService serverService;
   private final PasswordValidation passwordValidation;
+  private final InvitationLinkUsage invitationLinkUsage;
   private final boolean appOnlyAccessibleByInvitation;
 
   public UserService(EntityManager entityManager,
                      UserRepository userRepository,
                      UserHolder userHolder,
                      ServerProviderService serverProviderService,
-                     ServerService serverService,
                      PasswordValidation passwordValidation,
+                     InvitationLinkUsage invitationLinkUsage,
                      @ConfigProperty(name = "revoicechat.global.app-only-accessible-by-invitation")
                      boolean appOnlyAccessibleByInvitation) {
     this.entityManager = entityManager;
     this.userRepository = userRepository;
     this.userHolder = userHolder;
     this.serverProviderService = serverProviderService;
-    this.serverService = serverService;
     this.passwordValidation = passwordValidation;
+    this.invitationLinkUsage = invitationLinkUsage;
     this.appOnlyAccessibleByInvitation = appOnlyAccessibleByInvitation;
   }
 
@@ -91,12 +94,7 @@ public class UserService {
     user.setType(type);
     user.setPassword(PasswordUtils.encodePassword(signer.password()));
     entityManager.persist(user);
-    if (invitationLink != null) {
-      invitationLink.setStatus(InvitationLinkStatus.USED);
-      invitationLink.setApplier(user);
-      entityManager.persist(invitationLink);
-    }
-    serverService.joinDefaultServer(user);
+    invitationLinkUsage.use(invitationLink, user);
     return toRepresentation(user);
   }
 

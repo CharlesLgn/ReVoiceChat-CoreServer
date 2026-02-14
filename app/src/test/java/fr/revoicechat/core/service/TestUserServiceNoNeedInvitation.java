@@ -61,7 +61,7 @@ class TestUserServiceNoNeedInvitation {
     var resultRepresentation = userService.create(signer);
     assertThat(resultRepresentation).isNotNull();
     assertUser(resultRepresentation);
-    entityManager.refresh(invitation);
+    invitation = entityManager.find(InvitationLink.class, invitation.getId());
     assertThat(invitation.getStatus()).isEqualTo(InvitationLinkStatus.USED);
     assertThat(invitation.getApplier()).isNotNull();
   }

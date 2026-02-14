@@ -10,7 +10,7 @@ import fr.revoicechat.core.junit.CleanDatabase;
 import fr.revoicechat.core.model.MediaDataStatus;
 import fr.revoicechat.core.model.RoomType;
 import fr.revoicechat.core.model.ServerType;
-import fr.revoicechat.core.quarkus.profile.MultiServerProfile;
+import fr.revoicechat.core.quarkus.profile.BasicIntegrationTestProfile;
 import fr.revoicechat.core.representation.media.CreatedMediaDataRepresentation;
 import fr.revoicechat.core.representation.media.MediaDataRepresentation;
 import fr.revoicechat.core.representation.message.CreatedMessageRepresentation;
@@ -27,7 +27,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.MediaType;
 
 @QuarkusTest
-@TestProfile(MultiServerProfile.class)
+@TestProfile(BasicIntegrationTestProfile.class)
 @CleanDatabase
 class TestMediaDataController {
 
